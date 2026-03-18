@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scribbl</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="player-list-container">
+    <table id="users-info">
+      <thead>
+        <tr>
+          <th>Player</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody id="player-table-body">
+        <% users.forEach(function(user) { %>
+          <tr>
+            <td>
+              <strong>
+                <%= user.username %>
+              </strong>
+              <% if (user.isOwner) { %><span class="badge">Owner</span>
+                <% } %>
+            </td>
+            <td>
+              <%= user.score %>
+            </td>
+          </tr>
+          <% }); %>
+      </tbody>
+    </table>
+  </div>
+
+  
+
+  <div class="main-game-container">
+    <div id="game-bar">
+      <div id="timer">0</div>
+      <div id="round">0 of 3 round</div>
+      <div id="choose-words">
+        <% if (game.started) {%>
+          <button class="word">
+            <%= "_ ".repeat(game.currentWord.length) %>
+          </button> 
+        <% } %>
+      </div>
+      <div id="room-code">
+        <button id="roomCode">
+          <%= roomCode %>
+        </button>
+      </div>
+    </div>
+    <canvas id="draw-container"></canvas>
+
+    <div class="controls">
+      <button onclick="undo()"><img src="undo.png" alt="Undo"></button>
+      <button onclick="clearCanvas()"><img src="clear.png" alt="Clear"></button>
+      <button id="start"></button>
+    </div>
+  </div>
+
+  <div id="chat-container">
+    <div class="chat-messages" id="chat-messages"></div>
+    <div class="input-wrapper">
+      <input type="text" class="msgBox" placeholder="Type your guess...">
+      <button class="sendBtn">Send</button>
+    </div>
+  </div>
+
+  <script src="/script.js"></script>
+</body>
+
+</html>

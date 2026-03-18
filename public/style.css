@@ -1,0 +1,212 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+  background-color: #1a1a2e;
+  /* Deep dark blue */
+  color: #e0e0e0;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* 1. Player List */
+.player-list-container {
+  flex: 0 0 220px;
+  background: #16213e;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  overflow-y: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  text-align: left;
+  font-size: 0.8rem;
+  color: #4ecca3;
+  border-bottom: 2px solid #0f3460;
+  padding-bottom: 8px;
+}
+
+td {
+  padding: 10px 0;
+  border-bottom: 1px solid #0f3460;
+}
+
+.badge {
+  background: #4ecca3;
+  color: #1a1a2e;
+  font-size: 0.6rem;
+  padding: 2px 5px;
+  border-radius: 4px;
+  margin-left: 5px;
+  vertical-align: middle;
+}
+
+/* 2. Main Game Container (Canvas) */
+.main-game-container {
+  flex: 0 0 800px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+#draw-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+  cursor: crosshair;
+  width: 100%;
+  height: 500px;
+}
+
+#choose-words,
+#round,
+#room-code {
+  border-radius: 12px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.word {
+  /* Style for word selection buttons */
+  background: #e94560;
+  border: none;
+  color: white;
+  padding: 5px 15px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#game-bar {
+  display: flex;
+  border-radius: 12px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+#timer,
+#round,
+#roomCode {
+  color: black;
+  background-color: white;
+  padding: 5px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+  justify-content: center;
+}
+/* Controls */
+.controls {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.controls button {
+  img {
+    width: 20px;
+    height: 20px;
+  }
+
+  padding: 5px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button[onclick="undo()"] {
+  background: white;
+  color: black;
+}
+
+button[onclick="clearCanvas()"] {
+  background: white;
+  color: black;
+}
+
+#start {
+  background: white;
+  color: black;
+  flex-grow: 1;
+}
+
+button:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+/* 3. Chat Container */
+#chat-container {
+  flex: 0 0 300px;
+  background: #16213e;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.chat-messages {
+  flex-grow: 1;
+  padding: 15px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Chat Message Styling */
+.chat-messages div {
+  background: #0f3460;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  word-wrap: break-word;
+  max-width: 100%;
+}
+
+.input-wrapper {
+  display: flex;
+  padding: 10px;
+  background: #0f3460;
+  gap: 5px;
+}
+
+.msgBox {
+  flex-grow: 1;
+  background: #16213e;
+  border: 1px solid #1a1a2e;
+  padding: 10px;
+  color: white;
+  border-radius: 4px;
+}
+
+.sendBtn {
+  background: #4ecca3;
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}

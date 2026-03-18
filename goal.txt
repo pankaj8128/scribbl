@@ -1,0 +1,70 @@
+client should store only => roomCode (if joined), id, username
+
+player requests:                                  Server
+    creates room (with: username) => create room with random roomCode, 
+                                    add player to players[] -> 
+                                    (id, socket, ip, score(0))
+                                    create game{} -> 
+                                    (isStarted, countDown, startTime, round(0),
+                                          status(player/s is choosing/guessing word), 
+                                          drawing?(index, -1), currentWord, solved(Set))
+                                    render main.ejs with above data and extra attribute => isOwner(true, temporary to enable start button)
+                                    cookies -> username, id
+
+    join room (with: username, 
+                        roomCode) => if roomCode not exits -> return
+                                      add player to players[] -> 
+                                      (id, socket, ip, score(0))
+                                      render main.ejs with above data and extra attribute => isOwner(false, temporary to disable start button)
+                                    cookies -> username, id
+
+owner requests start game => if only owner in the room -> return
+                     repeat True {
+                             id (drawing + 1 === players.length) {
+                               round++;
+                               if (round < 4)
+                                 socket.send(all) => game over, players[], return, reset game{}, players.score
+                             }
+                             drawing = (drawing + 1) % players.length
+                             start countDown => 15
+                             getWords()
+                             socket.send(drawing) -> words
+                             socket.send(guessers) -> ${drawing} is drawing
+                             if countDown ends => select random word
+                             set startTime, currentWord, clear solved(set)
+
+                             clear canvas for all
+                             start countDown => 80
+                             socket.send(all) -> countDown
+                             socket.send(drawing) -> word to ${drawing} => disable typing chat
+                             socket.send(guessing) -> length(word) to guessers => disable canvas
+                             
+                             if player.msg == currentWord {
+                               socket.send(all) => ${player.username} solved
+                               socket.send(player) => solved, currentWord
+                               solved.add(player)
+                               player.score += CalculatedScore
+                             }
+
+                             if countDown ends => remaining players.score = 0
+                             countDown => 3
+                             socket.send(all) => players[]
+                             countDown ends => repeat
+                    }
+                    clear everything from client, server side
+                    socket.send(players[0], owner) -> enable start button
+
+player exits(before start, after start(if guesser)) => 
+    socket.send(all) -> ${username} exited, remove from players on client and server side
+    if (player was owner before start || player was owner after start but not drawer) 
+      remove owner, new owner will be again players[0]
+      socket.send(owner) -> isOwner to enable start button
+      socket.send(all) -> ${owner} is new owner
+      remove 
+
+new player joined aftern match started =>
+    send players[], game{startTime, currentWord.length, drawing, round, solved}
+
+edge cases:
+i) drawer exits
+    socket.send(all) -> ${drawing} exited, 

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scribbl</title>
+    <link rel="stylesheet" href="/indexcss.css">
+</head>
+
+<body>
+    <h1>Scribbl</h1>
+    <div class="container">
+        <form id="create-room-form" action="/create-room" method="post">
+            <input type="text" id="create-room-username" name="username" placeholder="Username">
+            <button type="submit">Create Room</button>
+        </form>
+
+        <form id="join-room-form" action="/join-room" method="post">
+            <input type="text" id="join-room-username" name="username" placeholder="Username">
+            <input type="text" id="join-room-code" name="roomCode" placeholder="Room Code">
+            <button type="submit">Join Room</button>
+        </form>
+    </div>
+</body>
+
+</html>

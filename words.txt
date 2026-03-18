@@ -1,0 +1,101 @@
+Heart
+Skull
+Lightning
+Cross
+Question Mark
+Exclamation Point
+Arrow
+Checkmark
+No Smoking
+Biohazard
+Home
+Key
+Envelope
+Telephone
+Clock
+Lightbulb
+Trash can
+Bed
+Fork
+Knife
+Magnifying Glass
+Sun
+Moon
+Cloud
+Rain
+Snowflake
+Mountain
+Tree
+Flower
+Fire
+Wave
+Star
+Leaf
+Tornado
+Cactus
+Rainbow
+Smiley Face
+Frown
+Eye
+Hand
+Footprint
+Crown
+User
+Brain
+Muscle
+Teardrop
+Apple
+Coffee Mug
+Wine Glass
+Pizza Slice
+Ice Cream Cone
+Chicken Leg
+Egg
+Cheese
+Burger
+Carrot
+Airplane
+Car
+Bicycle
+Anchor
+Tent
+Suitcase
+Wrench
+Scissors
+Camera
+Gift
+Battery
+Wifi
+Speaker
+Microphone
+Laptop
+Floppy Disk
+Plug
+Cloud
+Gear
+Shield
+Trophy
+Target
+Book
+Music Note
+Paint Palette
+Soccer Ball
+Dumbbell
+Controller
+Diamond
+Microscope
+Cat
+Dog
+Bird
+Fish
+Butterfly
+Snake
+Spider
+Rabbit
+Owl
+Elephant
+Infinity
+Dollar Sign
+Scale
+Hourglass
+Globe
