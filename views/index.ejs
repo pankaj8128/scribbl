@@ -4,23 +4,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scribbl</title>
+    <title>Scribbl - Draw, Guess & Have Fun!</title>
+    <meta name="description" content="Scribbl is a free online multiplayer drawing and guessing game. Draw, guess and have fun with friends!">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/indexcss.css">
 </head>
 
 <body>
-    <h1>Scribbl</h1>
-    <div class="container">
-        <form id="create-room-form" action="/create-room" method="post">
-            <input type="text" id="create-room-username" name="username" placeholder="Username">
-            <button type="submit">Create Room</button>
-        </form>
+    <div class="background-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+        <div class="shape shape-4"></div>
+        <div class="shape shape-5"></div>
+        <div class="shape shape-6"></div>
+    </div>
 
-        <form id="join-room-form" action="/join-room" method="post">
-            <input type="text" id="join-room-username" name="username" placeholder="Username">
-            <input type="text" id="join-room-code" name="roomCode" placeholder="Room Code">
-            <button type="submit">Join Room</button>
-        </form>
+    <div class="page-wrapper">
+        <div class="logo-section">
+            <img src="/images/scribbl_logo.png" alt="Scribbl Logo" class="logo-img">
+            <p class="tagline">Draw, Guess & Have Fun!</p>
+        </div>
+
+        <div class="container">
+            <div class="card create-card">
+                <div class="card-header">
+                    <span class="card-icon">🎨</span>
+                    <h2>Create a Room</h2>
+                </div>
+                <p class="card-desc">Start a new game and invite your friends to join!</p>
+                <form id="create-room-form" action="/create-room" method="post">
+                    <div class="input-group">
+                        <span class="input-icon">👤</span>
+                        <input type="text" id="create-room-username" name="username" placeholder="Enter your name..." required>
+                    </div>
+                    <button type="submit" class="btn btn-create">
+                        <span class="btn-text">Create Room</span>
+                        <span class="btn-icon">→</span>
+                    </button>
+                </form>
+            </div>
+
+            <div class="divider">
+                <div class="divider-line"></div>
+                <span class="divider-text">OR</span>
+                <div class="divider-line"></div>
+            </div>
+
+            <div class="card join-card">
+                <div class="card-header">
+                    <span class="card-icon">🔗</span>
+                    <h2>Join a Room</h2>
+                </div>
+                <p class="card-desc">Enter a room code to join an existing game!</p>
+                <form id="join-room-form" action="/join-room" method="post">
+                    <div class="input-group">
+                        <span class="input-icon">👤</span>
+                        <input type="text" id="join-room-username" name="username" placeholder="Enter your name..." required>
+                    </div>
+                    <div class="input-group">
+                        <span class="input-icon">🔑</span>
+                        <input type="text" id="join-room-code" name="roomCode" placeholder="Room code..." required>
+                    </div>
+                    <button type="submit" class="btn btn-join">
+                        <span class="btn-text">Join Room</span>
+                        <span class="btn-icon">→</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>Made with ❤️ | Scribbl Clone</p>
+        </footer>
     </div>
 </body>
 

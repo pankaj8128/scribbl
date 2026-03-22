@@ -25,27 +25,21 @@ let countdown = 0;
 const id = getCookie("id");
 const username = getCookie("username");
 const roomCode = getCookie("roomCode");
-const isOwner = Boolean(Number(getCookie("isOwner")));
-
-document.addEventListener("DOMContentLoaded", () => {
-  startBtn.innerText = isOwner ? "Start Game" : "Waiting to Start...";
-  if (!isOwner) startBtn.style.opacity = "0.6";
-});
 
 roomCodeBtn.addEventListener("click", () => {
   navigator.clipboard
     .writeText(roomCodeBtn.innerText)
     .then(() => {
-      appendMessage("SYSTEM", "Room Code Copied!", "");
+      appendMessage("SYSTEM", "Room Code Copied!", "success");
     })
     .catch((err) => {
       console.log("Error copying room code: ", err);
-      appendMessage("SYSTEM", "Error copying room code.", "err");
+      appendMessage("SYSTEM", "Error copying room code.", "error");
     });
 });
 
 socket.onopen = () => {
-  appendMessage("SYSTEM", "Connected to Room", "server");
+  appendMessage("SYSTEM", "Connected to Room", "success");
 };
 
 socket.onclose = () => {
@@ -55,58 +49,110 @@ socket.onclose = () => {
 socket.onmessage = (event) => {
   try {
     const data = JSON.parse(event.data);
+
+    if (data.drawerId !== undefined) window.currentDrawerId = data.drawerId;
+    if (data.players) window.currentPlayers = data.players;
+    if (data.game && data.game.drawerId !== undefined)
+      window.currentDrawerId = data.game.drawerId;
+
+    if (
+      data.drawerId !== undefined ||
+      data.type === "newPlayer" ||
+      data.players
+    ) {
+      addNewPlayer(window.currentPlayers || []);
+    }
+
     if (data.round) round.innerText = `${data.round} of 3 round`;
+
     if (data.type === "GameOver") {
       clearInterval(countdown);
+      appendMessage("SYSTEM", data.msg, "gameover");
+
+      const sortedFinal = [...(data.players || [])].sort(
+        (a, b) => b.score - a.score,
+      );
+      const leaderboardHtml = sortedFinal
+        .map((p, i) => {
+          const hue =
+            Array.from(p.username).reduce((a, b) => a + b.charCodeAt(0), 0) %
+            360;
+          return `
+           <div class="result-player-row" style="animation-delay: ${i * 0.1}s">
+             <div class="result-rank">#${i + 1}</div>
+             <div class="result-name">${p.username}</div>
+             <div class="result-score">${p.score} pts</div>
+           </div>
+         `;
+        })
+        .join("");
+
+      showCanvasOverlay(`
+        <div class="canvas-overlay-content">
+          <h2 class="overlay-title" style="color: #facc15; font-size: 2rem;">🏆 Final Results</h2>
+          <div class="result-players" style="max-height: 350px; overflow-y: auto;">
+            ${leaderboardHtml}
+          </div>
+          <p style="margin-top: 24px; color: var(--text-muted); font-weight: 700;">Waiting for owner to start a new game...</p>
+        </div>
+      `);
+
+      data.from = "SYSTEM";
       round.innerText = "0 of 3 round";
-    }
-    if (data.type === "SelectWord") {
-      appendMessage("SYSTEM", data.msg, "server");
-      clearInterval(countdown);
-      let timeLeft = 15;
-      timer.textContent = timeLeft;
-      countdown = setInterval(() => {
-        timeLeft--;
-        timer.textContent = timeLeft;
-        if (timeLeft <= 0) {
-          clearInterval(countdown);
-          const button = chooseWord.firstElementChild;
-          const word = button.innerText;
-          clearInterval(countdown);
-          if (socket.readyState === WebSocket.OPEN) {
-            const payload = JSON.stringify({
-              type: "SetCurrentWord",
-              roomCode,
-              word,
-            });
-            socket.send(payload);
-            chooseWord.innerHTML = "";
-            const button = document.createElement("button");
-            button.setAttribute("id", word);
-            button.classList.add("word");
-            button.innerText = word;
-            chooseWord.appendChild(button);
-            let timeLeft = 80;
-            timer.textContent = timeLeft;
-            countdown = setInterval(() => {
-              timeLeft--;
-              timer.textContent = timeLeft;
-              if (timeLeft <= 0) {
-                clearInterval(countdown);
-                console.log("Time is up!");
-              }
-            }, 1000);
-          } else {
-            appendMessage("SYSTEM", "Socket is not open", "error");
-          }
-          return;
-        }
-      }, 1000);
+      return;
+    } else if (data.type === "DisplayingResult") {
+      appendMessage("SYSTEM", data.msg, "round");
+      const timeRemaining = data.time !== undefined ? data.time : 5;
+      showResultOverlay(
+        data.players,
+        data.roundScores || {},
+        data.word,
+        timeRemaining,
+      );
+      startTimer(
+        timeRemaining,
+        "Time to DisplayingResult is over, waiting for server to response...",
+      );
+      return;
+    } else if (data.type === "NewOwner") {
+      appendMessage("SYSTEM", data.msg, "owner");
+      startBtn.disabled = false;
+      return;
+    } else if (data.type === "GotNewOwner") {
+      appendMessage("SYSTEM", data.msg, "owner");
+      return;
+    } else if (data.type === "Solved") {
+      const playerRow = document.getElementById(`player-${data.id}`);
+      if (playerRow) playerRow.style.background = "rgba(74, 222, 128, 0.2)";
+      appendMessage(data.from, data.msg, "solved");
+      if (data.word) {
+        chooseWord.innerHTML = "";
+        const button = document.createElement("button");
+        button.classList.add("word", "word-solved");
+        button.innerText = data.word;
+        chooseWord.appendChild(button);
+      }
+    } else if (data.type === "SelectWord") {
+      appendMessage("SYSTEM", data.msg, "round");
+      startTimer(
+        data.time !== undefined ? data.time : 15,
+        "Time to SelectWord is over, waiting for server to response...",
+      );
       chooseWord.innerHTML = "";
+
+      showCanvasOverlay(`
+        <div class="canvas-overlay-content">
+          <h2 class="overlay-title">Choose a word</h2>
+          <div class="word-choices" id="word-choices-container"></div>
+        </div>
+      `);
+
+      const choicesContainer = document.getElementById(
+        "word-choices-container",
+      );
       for (const word of data.words) {
         const button = document.createElement("button");
-        button.setAttribute("id", word);
-        button.classList.add("word");
+        button.classList.add("choice-btn");
         button.innerText = word;
         button.addEventListener(
           "click",
@@ -119,69 +165,53 @@ socket.onmessage = (event) => {
                 word,
               });
               socket.send(payload);
-              chooseWord.innerHTML = "";
-              const button = document.createElement("button");
-              button.setAttribute("id", word);
-              button.classList.add("word");
-              button.innerText = word;
-              chooseWord.appendChild(button);
-              let timeLeft = 80;
-              timer.textContent = timeLeft;
-              countdown = setInterval(() => {
-                timeLeft--;
-                timer.textContent = timeLeft;
-                if (timeLeft <= 0) {
-                  clearInterval(countdown);
-                  console.log("Time is up!");
-                  clearInterval(countdown);
-                  if (socket.readyState === WebSocket.OPEN) {
-                    socket.send(
-                      JSON.stringify({ type: "casual", msg: "Not Solved" }),
-                    );
-                  }
-                }
-              }, 1000);
-            } else {
-              appendMessage("SYSTEM", "Socket is not open", "error");
+              hideCanvasOverlay();
             }
           },
           { once: true },
         );
-        chooseWord.appendChild(button);
+        choicesContainer.appendChild(button);
       }
       enableDrawing();
-      clearCanvas();
+      clearCanvas(false);
       msgBox.disabled = true;
       return;
     } else if (data.type === "StartGame") {
-      appendMessage("SYSTEM", data.msg, "broadcast");
-      clearInterval(countdown);
-      let timeLeft = 15;
-      timer.textContent = timeLeft;
-      countdown = setInterval(() => {
-        timeLeft--;
-        timer.textContent = timeLeft;
-        if (timeLeft <= 0) clearInterval(countdown);
-      }, 1000);
+      appendMessage("SYSTEM", data.msg, "round");
+      chooseWord.innerHTML = "";
+      startTimer(
+        data.time !== undefined ? data.time : 15,
+        "Time to WaitForWord is over, waiting for server to response...",
+      );
+      showCanvasOverlay(`
+        <div class="canvas-overlay-content">
+          <h2 class="overlay-title">${data.msg}</h2>
+        </div>
+      `);
       return;
+    } else if (data.type === "DrawWord") {
+      hideCanvasOverlay();
+      startTimer(
+        data.time !== undefined ? data.time : 80,
+        "Time to DrawWord is over, waiting for server to response...",
+      );
+      chooseWord.innerHTML = "";
+      const button = document.createElement("button");
+      button.setAttribute("id", data.word);
+      button.classList.add("word");
+      button.innerText = data.word;
+      chooseWord.appendChild(button);
+      appendMessage("SYSTEM", data.msg, "round");
+      enableDrawing();
+      clearCanvas(false);
     } else if (data.type === "GuessWord") {
-      clearInterval(countdown);
-      let timeLeft = 80;
-      timer.textContent = timeLeft;
-      countdown = setInterval(() => {
-        timeLeft--;
-        timer.textContent = timeLeft;
-        if (timeLeft <= 0) {
-          clearInterval(countdown);
-          console.log("Time is up!");
-          clearInterval(countdown);
-          if (socket.readyState === WebSocket.OPEN) {
-            socket.send(JSON.stringify({ type: "casual", msg: "Not Solved" }));
-          }
-        }
-      }, 1000);
+      hideCanvasOverlay();
+      startTimer(
+        data.time !== undefined ? data.time : 80,
+        "Time to GuessWord is over, waiting for server to response...",
+      );
       const word = "_ ".repeat(data.length);
-      appendMessage("SYSTEM", data.msg, "server");
+      appendMessage("SYSTEM", data.msg, "round");
       chooseWord.innerHTML = "";
       const button = document.createElement("button");
       button.setAttribute("id", word);
@@ -189,22 +219,9 @@ socket.onmessage = (event) => {
       button.innerText = word;
       chooseWord.appendChild(button);
       disableDrawing();
-      clearCanvas();
+      clearCanvas(false);
       msgBox.disabled = false;
-    } else if (data.type === "AllSolved") {
-      if (!isOwner) return;
-      if (socket.readyState === WebSocket.OPEN) {
-        const payload = JSON.stringify({
-          type: "StartGame",
-          roomCode,
-          msg: "Continuing game...",
-        });
-        socket.send(payload);
-      } else {
-        appendMessage("SYSTEM", "Socket is not open", "error");
-      }
     } else if (data.type === "newPlayer") {
-      addNewPlayer(data.data);
     } else if (data.type === "drawStart") {
       ctx.beginPath();
       ctx.moveTo(data.x, data.y);
@@ -219,8 +236,31 @@ socket.onmessage = (event) => {
       undo(false);
     } else if (data.type === "clear") {
       clearCanvas(false);
+    } else if (data.type === "RequestCanvas") {
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send(
+          JSON.stringify({
+            type: "SyncCanvas",
+            roomCode,
+            toPlayerId: data.toPlayerId,
+            image: canvas.toDataURL(),
+          }),
+        );
+      }
+    } else if (data.type === "SyncCanvas") {
+      const img = new Image();
+      img.onload = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+        saveState();
+      };
+      img.src = data.image;
+    } else if (data.type === "Exit") {
+      appendMessage("SYSTEM", data.msg, data.msgStyle || "leave");
+    } else if (data.type === "SYSTEM") {
+      appendMessage("SYSTEM", data.msg, data.msgStyle || "info");
     } else {
-      appendMessage(data.from, data.msg, "broadcast");
+      appendMessage(data.from, data.msg, "chat");
     }
   } catch (e) {
     console.log("Error: ", e);
@@ -236,47 +276,128 @@ socket.onerror = (error) => {
   );
 };
 
-function addNewPlayer(dataset) {
-  userInfo.innerHTML = `
-    <thead>
-        <tr>
-          <th>Username</th>
-          <th>Score</th>
-        </tr>
-      </thead>
+function showResultOverlay(players, roundScores, word, timeRemainingSecs = 5) {
+  const container = document.querySelector(".main-game-container");
+  const existing = document.getElementById("result-overlay");
+  if (existing) existing.remove();
+
+  const overlay = document.createElement("div");
+  overlay.id = "result-overlay";
+  overlay.innerHTML = `
+    <div class="result-overlay-inner">
+      <h2 class="result-title">🎯 Round Results</h2>
+      ${word ? `<div class="result-word-reveal">The word was: <span class="revealed-word">${word}</span></div>` : ""}
+      <div class="result-players">
+        ${players
+          .map((p, i) => {
+            const gained = roundScores[p.id] || 0;
+            const isMe = p.id === id;
+            return `
+              <div class="result-player-row ${isMe ? "result-me" : ""}" style="animation-delay: ${i * 0.1}s">
+                <div class="result-rank">${i + 1}</div>
+                <div class="result-name">${p.username}${isMe ? " (you)" : ""}</div>
+                <div class="result-score">${p.score}</div>
+                ${gained > 0 ? `<div class="result-gained">+${gained}</div>` : `<div class="result-gained zero">+0</div>`}
+              </div>
+            `;
+          })
+          .join("")}
+      </div>
+    </div>
   `;
-  for (const data of dataset) {
-    userInfo.innerHTML += `
-      <tbody>
-        <tr>
-          <td><strong>${data.username}</strong></td>
-          <td>${data.score}</td>
-         </tr>
-      </tbody>
+
+  container.insertBefore(overlay, container.firstChild);
+
+  setTimeout(
+    () => {
+      overlay.classList.add("result-fade-out");
+      setTimeout(() => overlay.remove(), 400);
+    },
+    Math.max(0, timeRemainingSecs * 1000 - 400),
+  );
+}
+
+function showCanvasOverlay(htmlContent) {
+  hideCanvasOverlay();
+  const container = document.querySelector(".canvas-wrapper");
+  const overlay = document.createElement("div");
+  overlay.id = "canvas-status-overlay";
+  overlay.innerHTML = htmlContent;
+  container.appendChild(overlay);
+}
+
+function hideCanvasOverlay() {
+  const existing = document.getElementById("canvas-status-overlay");
+  if (existing) existing.remove();
+}
+
+function addNewPlayer(dataset) {
+  if (!dataset || !dataset.length) return;
+  const sortedPlayers = [...dataset].sort((a, b) => b.score - a.score);
+
+  let htmlResult = "";
+
+  sortedPlayers.forEach((player, index) => {
+    const isMe = player.id === id;
+    const isDrawer = window.currentDrawerId === player.id;
+    const hue =
+      Array.from(player.username).reduce((a, b) => a + b.charCodeAt(0), 0) %
+      360;
+
+    htmlResult += `
+      <div class="player-entry" id="player-${player.id}">
+        <div class="player-rank">#${index + 1}</div>
+        <div class="player-info">
+          <div class="player-name">
+            <strong>${player.username}${isMe ? " (you)" : ""}</strong>
+            ${isDrawer ? '<span class="pencil-icon" title="Drawing">✏️</span>' : ""}
+          </div>
+          <div class="player-score">${player.score} points</div>
+        </div>
+      </div>
     `;
+  });
+
+  const usersInfoDiv = document.getElementById("users-info");
+  if (usersInfoDiv) {
+    usersInfoDiv.innerHTML = htmlResult;
   }
 }
 
-function appendMessage(from = "SYSTEM", content, type = "broadcast") {
+function appendMessage(from = "SYSTEM", content, type = "chat") {
   const msgElement = document.createElement("div");
+  msgElement.classList.add("msg", `msg-${type}`);
 
-  // Style based on type
-  if (type === "error") {
-    msgElement.style.backgroundColor = "#53354a";
-    msgElement.style.color = "#e94560";
-    msgElement.style.borderLeft = "4px solid #e94560";
-  } else if (type === "server") {
-    msgElement.style.backgroundColor = "#1b3a31";
-    msgElement.style.color = "#4ecca3";
-    msgElement.style.textAlign = "center";
-    msgElement.style.fontWeight = "bold";
+  const isSystem = [
+    "success",
+    "error",
+    "join",
+    "leave",
+    "round",
+    "gameover",
+    "owner",
+    "warning",
+    "info",
+    "solved",
+  ].includes(type);
+
+  if (isSystem) {
+    const icon =
+      {
+        success: "✅",
+        error: "❌",
+        join: "🟢",
+        leave: "🔴",
+        round: "🎯",
+        gameover: "🏆",
+        owner: "👑",
+        warning: "⚠️",
+        info: "ℹ️",
+        solved: "✔️",
+      }[type] || "";
+    msgElement.innerHTML = `<span class="msg-icon">${icon}</span><span class="msg-content">${content}</span>`;
   } else {
-    // Standard chat message
-    msgElement.innerHTML = `<strong style="color: #4ecca3">${from}:</strong> ${content}`;
-  }
-
-  if (type !== "broadcast") {
-    msgElement.textContent = `${from}: ${content}`;
+    msgElement.innerHTML = `<span class="msg-user">${from}:</span> <span class="msg-content">${content}</span>`;
   }
 
   chatMessages.appendChild(msgElement);
@@ -461,19 +582,21 @@ function getWords() {
   }
 }
 
-function startTimer(time) {
+function startTimer(time, msg) {
   clearInterval(countdown);
   let timeLeft = time;
   timer.textContent = timeLeft;
   countdown = setInterval(() => {
     timeLeft--;
     timer.textContent = timeLeft;
-    if (timeLeft <= 0) clearInterval(countdown);
+    if (timeLeft <= 0) {
+      clearInterval(countdown);
+      console.log(msg);
+    }
   }, 1000);
 }
 
 startBtn.addEventListener("click", () => {
-  if (!isOwner) return;
   if (socket.readyState === WebSocket.OPEN) {
     const payload = JSON.stringify({
       type: "StartGame",

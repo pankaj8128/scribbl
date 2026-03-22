@@ -4,76 +4,108 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scribbl</title>
+  <title>Scribbl - Game Room</title>
+  <meta name="description" content="Scribbl game room - Draw, guess and compete with friends!">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <div class="player-list-container">
-    <table id="users-info">
-      <thead>
-        <tr>
-          <th>Player</th>
-          <th>Score</th>
-        </tr>
-      </thead>
-      <tbody id="player-table-body">
-        <% users.forEach(function(user) { %>
-          <tr>
-            <td>
-              <strong>
-                <%= user.username %>
-              </strong>
-              <% if (user.isOwner) { %><span class="badge">Owner</span>
-                <% } %>
-            </td>
-            <td>
-              <%= user.score %>
-            </td>
-          </tr>
-          <% }); %>
-      </tbody>
-    </table>
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <a href="/">
+        <img src="/images/scribbl_logo.png" alt="Scribbl" class="top-logo">
+      </a>
+    </div>
+    <div class="top-bar-center">
+      <div id="game-bar">
+        <div class="game-info-pill timer-pill">
+          <span class="pill-icon">⏱️</span>
+          <span id="timer">0</span>
+        </div>
+        <div class="game-info-pill round-pill">
+          <span class="pill-icon">🔄</span>
+          <span id="round">0 of 3 round</span>
+        </div>
+        <div id="choose-words">
+          <% if (game.started) {%>
+            <button class="word">
+              <%= "_ " .repeat(game.currentWord.length) %>
+            </button>
+          <% } %>
+        </div>
+      </div>
+    </div>
+    <div class="top-bar-right">
+      <div id="room-code" class="room-code-container">
+        <span class="room-code-icon" title="Room Code">📋</span>
+        <button id="roomCode" class="room-code-btn" title="Click to copy room code"><%= roomCode %></button>
+      </div>
+    </div>
   </div>
 
-  
+  <!-- Main Content -->
+  <div class="game-layout">
 
-  <div class="main-game-container">
-    <div id="game-bar">
-      <div id="timer">0</div>
-      <div id="round">0 of 3 round</div>
-      <div id="choose-words">
-        <% if (game.started) {%>
-          <button class="word">
-            <%= "_ ".repeat(game.currentWord.length) %>
-          </button> 
-        <% } %>
+    <!-- Left: Player List -->
+    <div class="player-list-container">
+      <div class="panel-header">
+        <span class="panel-icon">👥</span>
+        <span class="panel-title">Players</span>
       </div>
-      <div id="room-code">
-        <button id="roomCode">
-          <%= roomCode %>
+      <div id="users-info"></div>
+    </div>
+
+    <!-- Center: Canvas -->
+    <div class="main-game-container">
+      <div class="canvas-wrapper">
+        <canvas id="draw-container"></canvas>
+      </div>
+
+      <div class="controls">
+        <div class="controls-left">
+          <button onclick="undo()" class="ctrl-btn" title="Undo">
+            <img src="/images/undo.png" alt="Undo">
+          </button>
+          <button onclick="clearCanvas()" class="ctrl-btn" title="Clear Canvas">
+            <img src="/images/clear.png" alt="Clear">
+          </button>
+        </div>
+        <div class="controls-right">
+          <button id="start" <%=isOwner ? "" : "disabled" %>>
+            <span class="start-icon">▶</span>
+            Start Game
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Chat -->
+    <div id="chat-container">
+      <div class="panel-header">
+        <span class="panel-icon">💬</span>
+        <span class="panel-title">Chat</span>
+      </div>
+      <div class="chat-messages" id="chat-messages"></div>
+      <div class="input-wrapper">
+        <input type="text" class="msgBox" placeholder="Type your guess...">
+        <button class="sendBtn">
+          <span class="send-icon">➤</span>
         </button>
       </div>
     </div>
-    <canvas id="draw-container"></canvas>
 
-    <div class="controls">
-      <button onclick="undo()"><img src="undo.png" alt="Undo"></button>
-      <button onclick="clearCanvas()"><img src="clear.png" alt="Clear"></button>
-      <button id="start"></button>
-    </div>
   </div>
 
-  <div id="chat-container">
-    <div class="chat-messages" id="chat-messages"></div>
-    <div class="input-wrapper">
-      <input type="text" class="msgBox" placeholder="Type your guess...">
-      <button class="sendBtn">Send</button>
-    </div>
-  </div>
-
-  <script src="/script.js"></script>
+  <script src="/globals.js"></script>
+  <script src="/ui.js"></script>
+  <script src="/canvas.js"></script>
+  <script src="/socket.js"></script>
+  <script src="/app.js"></script>
 </body>
 
 </html>

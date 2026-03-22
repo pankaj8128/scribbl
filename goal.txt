@@ -3,20 +3,21 @@ client should store only => roomCode (if joined), id, username
 player requests:                                  Server
     creates room (with: username) => create room with random roomCode, 
                                     add player to players[] -> 
-                                    (id, socket, ip, score(0))
+                                    (id, username, socket, ip, score(0))
                                     create game{} -> 
-                                    (isStarted, countDown, startTime, round(0),
+                                    (isStarted, countDown, startTime, round(1),
                                           status(player/s is choosing/guessing word), 
                                           drawing?(index, -1), currentWord, solved(Set))
                                     render main.ejs with above data and extra attribute => isOwner(true, temporary to enable start button)
-                                    cookies -> username, id
+                                    cookies -> id, username, roomCode
 
     join room (with: username, 
                         roomCode) => if roomCode not exits -> return
                                       add player to players[] -> 
-                                      (id, socket, ip, score(0))
+                                      (id, username, socket, ip, score(0))
                                       render main.ejs with above data and extra attribute => isOwner(false, temporary to disable start button)
-                                    cookies -> username, id
+                                    cookies -> id, username, roomCode
+
 
 owner requests start game => if only owner in the room -> return
                      repeat True {
