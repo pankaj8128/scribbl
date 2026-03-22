@@ -1,4 +1,5 @@
-const socket = new WebSocket(`ws://${window.location.host}`);
+const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+const socket = new WebSocket(`${protocol}//${window.location.host}`);
 
 const chatContainer = document.getElementById("chat-container");
 const chatMessages = document.getElementById("chat-messages");
