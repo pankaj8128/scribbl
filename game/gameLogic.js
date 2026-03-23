@@ -110,7 +110,7 @@ function selectingWord(roomCode) {
   clients[roomCode]["players"].forEach((player) => {
     if (
       player.id !==
-        clients[roomCode]["players"][clients[roomCode]["game"].drawing].id &&
+      clients[roomCode]["players"][clients[roomCode]["game"].drawing].id &&
       player.client &&
       player.client.readyState === WebSocket.OPEN
     ) {
@@ -125,7 +125,7 @@ function selectingWord(roomCode) {
       );
     } else if (
       player.id ===
-        clients[roomCode]["players"][clients[roomCode]["game"].drawing].id &&
+      clients[roomCode]["players"][clients[roomCode]["game"].drawing].id &&
       player.client &&
       player.client.readyState === WebSocket.OPEN
     ) {
@@ -155,7 +155,7 @@ function setCurrentWord(roomCode, word) {
   clients[roomCode]["players"].forEach((player) => {
     if (
       clients[roomCode]["players"].indexOf(player) !==
-        clients[roomCode]["game"].drawing &&
+      clients[roomCode]["game"].drawing &&
       player.client &&
       player.client.readyState === WebSocket.OPEN
     ) {
@@ -170,7 +170,7 @@ function setCurrentWord(roomCode, word) {
       );
     } else if (
       clients[roomCode]["players"].indexOf(player) ===
-        clients[roomCode]["game"].drawing &&
+      clients[roomCode]["game"].drawing &&
       player.client &&
       player.client.readyState === WebSocket.OPEN
     ) {
@@ -207,7 +207,7 @@ function displayResult(roomCode) {
       player.client.send(
         JSON.stringify({
           type: "DisplayingResult",
-          msg: `${clients[roomCode]["game"].currentWord} was the current word. View the result!`,
+          msg: `'${clients[roomCode]["game"].currentWord}' was the word.`,
           players: formatPlayers(clients[roomCode]["players"]),
           roundScores: roundScores,
           word: clients[roomCode]["game"].currentWord,

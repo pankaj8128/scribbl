@@ -3,6 +3,9 @@ function initCanvas() {
   canvas.width = canvas.clientWidth;
   canvas.height = canvas.clientHeight;
 
+  // Prevent touch scrolling/zooming on canvas
+  canvas.style.touchAction = "none";
+
   ctx.lineWidth = 5;
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
@@ -18,6 +21,8 @@ function saveState() {
 }
 
 function undo(emit = true) {
+  // Block undo if not the drawer
+  if (emit && !window.isDrawing) return;
   if (undoStack.length <= 1) return;
 
   undoStack.pop();
@@ -43,6 +48,8 @@ function undo(emit = true) {
 }
 
 function clearCanvas(emit = true) {
+  // Block clear if not the drawer (but allow non-emit calls for local resets)
+  if (emit && !window.isDrawing) return;
   if (!ctx) return;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   undoStack = [];
@@ -69,6 +76,7 @@ function getPointerPos(event) {
 }
 
 function startPainting(event) {
+  event.preventDefault(); // Prevent scroll/zoom on mobile
   isPainting = true;
   const pos = getPointerPos(event);
   ctx.beginPath();
@@ -79,8 +87,8 @@ function startPainting(event) {
       JSON.stringify({
         type: "drawStart",
         roomCode,
-        x: pos.x,
-        y: pos.y,
+        x: pos.x / canvas.width,
+        y: pos.y / canvas.height,
         username,
         id,
       }),
@@ -108,6 +116,7 @@ function stopPainting() {
 
 function draw(event) {
   if (!isPainting) return;
+  event.preventDefault(); // Prevent scroll/zoom on mobile
   const pos = getPointerPos(event);
   ctx.lineTo(pos.x, pos.y);
   ctx.stroke();
@@ -118,8 +127,8 @@ function draw(event) {
       JSON.stringify({
         type: "draw",
         roomCode,
-        x: pos.x,
-        y: pos.y,
+        x: pos.x / canvas.width,
+        y: pos.y / canvas.height,
         username,
         id,
       }),
@@ -140,3 +149,20 @@ function enableDrawing() {
   canvas.addEventListener("pointermove", draw);
   canvas.addEventListener("pointerup", stopPainting);
 }
+
+// Re-scale canvas on window resize to keep drawing surface in sync
+window.addEventListener("resize", () => {
+  if (!canvas || !ctx) return;
+  const imageData = canvas.toDataURL();
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
+  const img = new Image();
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    ctx.lineWidth = 5;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = "#000000";
+  };
+  img.src = imageData;
+});

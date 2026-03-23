@@ -31,9 +31,10 @@ socket.onmessage = (event) => {
       addNewPlayer(window.currentPlayers || []);
     }
 
-    if (data.round && round) round.innerText = `${data.round} of 3 round`;
+    if (data.round && round) round.innerText = `Round ${data.round} of 3`;
 
     if (data.type === "GameOver") {
+      window.isDrawing = false;
       clearInterval(countdown);
       appendMessage("SYSTEM", data.msg, "gameover");
 
@@ -63,9 +64,10 @@ socket.onmessage = (event) => {
       `);
 
       data.from = "SYSTEM";
-      if (round) round.innerText = "0 of 3 round";
+      if (round) round.innerText = "Round 0 of 3";
       return;
     } else if (data.type === "DisplayingResult") {
+      window.isDrawing = false;
       appendMessage("SYSTEM", data.msg, "round");
       const timeRemaining = data.time !== undefined ? data.time : 5;
       showResultOverlay(
@@ -156,6 +158,7 @@ socket.onmessage = (event) => {
       return;
     } else if (data.type === "DrawWord") {
       hideCanvasOverlay();
+      window.isDrawing = true;
       startTimer(
         data.time !== undefined ? data.time : 80,
         "Time to DrawWord is over, waiting for server to response...",
@@ -173,6 +176,7 @@ socket.onmessage = (event) => {
       clearCanvas(false);
     } else if (data.type === "GuessWord") {
       hideCanvasOverlay();
+      window.isDrawing = false;
       startTimer(
         data.time !== undefined ? data.time : 80,
         "Time to GuessWord is over, waiting for server to response...",
@@ -192,11 +196,19 @@ socket.onmessage = (event) => {
       if (msgBox) msgBox.disabled = false;
     } else if (data.type === "newPlayer") {
     } else if (data.type === "drawStart") {
-      if(ctx) { ctx.beginPath(); ctx.moveTo(data.x, data.y); }
+      if (ctx && canvas) {
+        const rx = data.x * canvas.width;
+        const ry = data.y * canvas.height;
+        ctx.beginPath(); ctx.moveTo(rx, ry);
+      }
     } else if (data.type === "draw") {
-      if(ctx) { ctx.lineTo(data.x, data.y); ctx.stroke(); ctx.moveTo(data.x, data.y); }
+      if (ctx && canvas) {
+        const rx = data.x * canvas.width;
+        const ry = data.y * canvas.height;
+        ctx.lineTo(rx, ry); ctx.stroke(); ctx.moveTo(rx, ry);
+      }
     } else if (data.type === "drawEnd") {
-      if(ctx) { ctx.closePath(); saveState(); }
+      if (ctx) { ctx.closePath(); saveState(); }
     } else if (data.type === "undo") {
       undo(false);
     } else if (data.type === "clear") {
@@ -213,11 +225,11 @@ socket.onmessage = (event) => {
         );
       }
     } else if (data.type === "SyncCanvas") {
-      if(!ctx) return;
+      if (!ctx || !canvas) return;
       const img = new Image();
       img.onload = () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         saveState();
       };
       img.src = data.image;

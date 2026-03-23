@@ -22,6 +22,9 @@ const MAX_UNDO = 20;
 
 let countdown = 0;
 
+// Track drawing permission (set by socket.js on DrawWord/GuessWord)
+window.isDrawing = false;
+
 function getCookie(name) {
   return document.cookie
     .split("; ")
@@ -32,3 +35,9 @@ function getCookie(name) {
 const id = getCookie("id");
 const username = getCookie("username");
 const roomCode = getCookie("roomCode");
+
+// Redirect to home if essential cookies are missing
+if (!roomCode || !id || !username) {
+  window.location.href = "/";
+}
+

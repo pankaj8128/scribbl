@@ -169,6 +169,17 @@ function handleSockets(wss) {
       }
 
       if (["drawStart", "draw", "drawEnd", "undo", "clear"].includes(data.type)) {
+        // Only the current drawer can send draw/undo/clear commands
+        const game = clients[data.roomCode]["game"];
+        const drawingIndex = game.drawing;
+        if (
+          !game.isStarted ||
+          drawingIndex < 0 ||
+          drawingIndex >= clients[data.roomCode]["players"].length ||
+          clients[data.roomCode]["players"][drawingIndex].id !== socket.id
+        ) {
+          return; // Not the drawer, silently ignore
+        }
         clients[data.roomCode]["players"].forEach((player) => {
           if (
             player.client !== socket &&

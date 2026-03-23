@@ -44,9 +44,9 @@ function setupRoutes(app) {
       scores: {},
     };
     clients[roomCode]["game"] = game;
-    res.cookie("id", id);
-    res.cookie("username", username);
-    res.cookie("roomCode", roomCode);
+    res.cookie("id", id, { path: "/" });
+    res.cookie("username", username, { path: "/" });
+    res.cookie("roomCode", roomCode, { path: "/" });
     if (!req.session) req.session = {};
     req.session.isOwner = true;
     res.redirect(`/${roomCode}`);
@@ -65,9 +65,9 @@ function setupRoutes(app) {
         score: 0,
       };
       clients[roomCode]["players"].push(player);
-      res.cookie("id", id);
-      res.cookie("username", username);
-      res.cookie("roomCode", roomCode);
+      res.cookie("id", id, { path: "/" });
+      res.cookie("username", username, { path: "/" });
+      res.cookie("roomCode", roomCode, { path: "/" });
       if (!req.session) req.session = {};
       req.session.isOwner = false;
       res.redirect(`/${roomCode}`);

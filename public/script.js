@@ -63,7 +63,7 @@ socket.onmessage = (event) => {
       addNewPlayer(window.currentPlayers || []);
     }
 
-    if (data.round) round.innerText = `${data.round} of 3 round`;
+    if (data.round) round.innerText = `Round ${data.round} of 3`;
 
     if (data.type === "GameOver") {
       clearInterval(countdown);
@@ -98,7 +98,7 @@ socket.onmessage = (event) => {
       `);
 
       data.from = "SYSTEM";
-      round.innerText = "0 of 3 round";
+      round.innerText = "Round 0 of 3";
       return;
     } else if (data.type === "DisplayingResult") {
       appendMessage("SYSTEM", data.msg, "round");
@@ -289,10 +289,10 @@ function showResultOverlay(players, roundScores, word, timeRemainingSecs = 5) {
       ${word ? `<div class="result-word-reveal">The word was: <span class="revealed-word">${word}</span></div>` : ""}
       <div class="result-players">
         ${players
-          .map((p, i) => {
-            const gained = roundScores[p.id] || 0;
-            const isMe = p.id === id;
-            return `
+      .map((p, i) => {
+        const gained = roundScores[p.id] || 0;
+        const isMe = p.id === id;
+        return `
               <div class="result-player-row ${isMe ? "result-me" : ""}" style="animation-delay: ${i * 0.1}s">
                 <div class="result-rank">${i + 1}</div>
                 <div class="result-name">${p.username}${isMe ? " (you)" : ""}</div>
@@ -300,8 +300,8 @@ function showResultOverlay(players, roundScores, word, timeRemainingSecs = 5) {
                 ${gained > 0 ? `<div class="result-gained">+${gained}</div>` : `<div class="result-gained zero">+0</div>`}
               </div>
             `;
-          })
-          .join("")}
+      })
+      .join("")}
       </div>
     </div>
   `;

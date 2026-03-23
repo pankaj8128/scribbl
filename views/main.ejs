@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Scribbl - Game Room</title>
   <meta name="description" content="Scribbl game room - Draw, guess and compete with friends!">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,21 +29,23 @@
         </div>
         <div class="game-info-pill round-pill">
           <span class="pill-icon">🔄</span>
-          <span id="round">0 of 3 round</span>
+          <span id="round">Round 0 of 3</span>
         </div>
         <div id="choose-words">
           <% if (game.started) {%>
             <button class="word">
               <%= "_ " .repeat(game.currentWord.length) %>
             </button>
-          <% } %>
+            <% } %>
         </div>
       </div>
     </div>
     <div class="top-bar-right">
       <div id="room-code" class="room-code-container">
         <span class="room-code-icon" title="Room Code">📋</span>
-        <button id="roomCode" class="room-code-btn" title="Click to copy room code"><%= roomCode %></button>
+        <button id="roomCode" class="room-code-btn" title="Click to copy room code">
+          <%= roomCode %>
+        </button>
       </div>
     </div>
   </div>
