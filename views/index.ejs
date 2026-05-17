@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scribbl - Draw, Guess & Have Fun!</title>
-    <meta name="description" content="Scribbl is a free online multiplayer drawing and guessing game. Draw, guess and have fun with friends!">
+    <link rel="icon" type="image/png" href="/images/logo.png">
+    <meta name="description"
+        content="Scribbl is a free online multiplayer drawing and guessing game. Draw, guess and have fun with friends!">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -38,7 +40,8 @@
                 <form id="create-room-form" action="/create-room" method="post">
                     <div class="input-group">
                         <span class="input-icon">👤</span>
-                        <input type="text" id="create-room-username" name="username" placeholder="Enter your name..." required>
+                        <input type="text" id="create-room-username" name="username" placeholder="Enter your name..."
+                            required>
                     </div>
                     <button type="submit" class="btn btn-create">
                         <span class="btn-text">Create Room</span>
@@ -62,11 +65,12 @@
                 <form id="join-room-form" action="/join-room" method="post">
                     <div class="input-group">
                         <span class="input-icon">👤</span>
-                        <input type="text" id="join-room-username" name="username" placeholder="Enter your name..." required>
+                        <input type="text" id="join-room-username" name="username" placeholder="Enter your name..."
+                            required>
                     </div>
                     <div class="input-group">
                         <span class="input-icon">🔑</span>
-                        <input type="text" id="join-room-code" name="roomCode" placeholder="Room code..." required>
+                        <input type="text" id="join-room-code" name="roomCode" placeholder="Room code..." required value="<%= locals.prefillRoom || '' %>">
                     </div>
                     <button type="submit" class="btn btn-join">
                         <span class="btn-text">Join Room</span>
@@ -77,9 +81,18 @@
         </div>
 
         <footer class="footer">
-            <p>Made with ❤️ | Scribbl Clone</p>
+            <p>Made with ❤️ | Scribbl Clone by <a href="https://github.com/pankaj8128" target="_blank">Pankaj
+                    Jagadale</a></p>
         </footer>
     </div>
+    <% if (locals.prefillRoom) { %>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('join-room-username').focus();
+            document.querySelector('.join-card').scrollIntoView({ behavior: 'smooth' });
+        });
+    </script>
+    <% } %>
 </body>
 
 </html>

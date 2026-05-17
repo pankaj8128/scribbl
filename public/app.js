@@ -21,14 +21,15 @@ function sendMessage() {
 
 if (roomCodeBtn) {
   roomCodeBtn.addEventListener("click", () => {
+    const inviteLink = window.location.origin + "/" + roomCode;
     navigator.clipboard
-      .writeText(roomCodeBtn.innerText)
+      .writeText(inviteLink)
       .then(() => {
-        appendMessage("SYSTEM", "Room Code Copied!", "success");
+        appendMessage("SYSTEM", "Invite Link Copied!", "success");
       })
       .catch((err) => {
-        console.log("Error copying room code: ", err);
-        appendMessage("SYSTEM", "Error copying room code.", "error");
+        console.log("Error copying invite link: ", err);
+        appendMessage("SYSTEM", "Error copying invite link.", "error");
       });
   });
 }

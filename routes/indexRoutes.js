@@ -3,16 +3,22 @@ const { formatPlayers, formatGame, createRoomLink } = require("../utils/helpers"
 
 function setupRoutes(app) {
   app.get("/:roomCode", (req, res) => {
-    if (req.params.roomCode in clients) {
+    const roomCode = req.params.roomCode;
+    if (roomCode in clients) {
       if (!req.session) {
           req.session = {}; // in case of error
       }
+      
+      if (!req.cookies || !req.cookies.username || req.cookies.roomCode !== roomCode) {
+        return res.redirect(`/?room=${roomCode}`);
+      }
+
       return res.render("main", {
-        roomCode: req.params.roomCode,
-        users: formatPlayers(clients[req.params.roomCode]["players"]),
+        roomCode: roomCode,
+        users: formatPlayers(clients[roomCode]["players"]),
         game: formatGame(
-          clients[req.params.roomCode]["game"],
-          clients[req.params.roomCode]["players"],
+          clients[roomCode]["game"],
+          clients[roomCode]["players"],
         ),
         isOwner: req.session.isOwner,
       });
@@ -77,7 +83,8 @@ function setupRoutes(app) {
   });
 
   app.get("/", (req, res) => {
-    res.render("index");
+    const prefillRoom = req.query.room || "";
+    res.render("index", { prefillRoom });
   });
 }
 
