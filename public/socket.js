@@ -31,7 +31,9 @@ socket.onmessage = (event) => {
       addNewPlayer(window.currentPlayers || []);
     }
 
-    if (data.round && round) round.innerText = `Round ${data.round} of 3`;
+    if (data.round && round) {
+      round.innerHTML = `<span class="round-prefix">Round </span>${data.round}<span class="round-sep-long"> of </span><span class="round-sep-short">/</span>3`;
+    }
 
     if (data.type === "GameOver") {
       window.isDrawing = false;
@@ -64,7 +66,9 @@ socket.onmessage = (event) => {
       `);
 
       data.from = "SYSTEM";
-      if (round) round.innerText = "Round 0 of 3";
+      if (round) {
+        round.innerHTML = `<span class="round-prefix">Round </span>0<span class="round-sep-long"> of </span><span class="round-sep-short">/</span>3`;
+      }
       return;
     } else if (data.type === "DisplayingResult") {
       window.isDrawing = false;
@@ -88,7 +92,7 @@ socket.onmessage = (event) => {
     } else if (data.type === "GotNewOwner") {
       appendMessage("SYSTEM", data.msg, "owner");
       return;
-    } else if (data.type === "Solved") {
+    } else if (data.type.startsWith("Solved")) {
       const playerRow = document.getElementById(`player-${data.id}`);
       if (playerRow) playerRow.style.background = "rgba(74, 222, 128, 0.2)";
       appendMessage(data.from, data.msg, "solved");
@@ -99,6 +103,11 @@ socket.onmessage = (event) => {
         button.innerText = data.word;
         chooseWord.appendChild(button);
       }
+      if (data.type.endsWith("First"))
+        startTimer(
+          30,
+          "Time over after shrink, waiting for server to response...",
+        );
     } else if (data.type === "SelectWord") {
       appendMessage("SYSTEM", data.msg, "round");
       startTimer(
@@ -199,16 +208,22 @@ socket.onmessage = (event) => {
       if (ctx && canvas) {
         const rx = data.x * canvas.width;
         const ry = data.y * canvas.height;
-        ctx.beginPath(); ctx.moveTo(rx, ry);
+        ctx.beginPath();
+        ctx.moveTo(rx, ry);
       }
     } else if (data.type === "draw") {
       if (ctx && canvas) {
         const rx = data.x * canvas.width;
         const ry = data.y * canvas.height;
-        ctx.lineTo(rx, ry); ctx.stroke(); ctx.moveTo(rx, ry);
+        ctx.lineTo(rx, ry);
+        ctx.stroke();
+        ctx.moveTo(rx, ry);
       }
     } else if (data.type === "drawEnd") {
-      if (ctx) { ctx.closePath(); saveState(); }
+      if (ctx) {
+        ctx.closePath();
+        saveState();
+      }
     } else if (data.type === "undo") {
       undo(false);
     } else if (data.type === "clear") {

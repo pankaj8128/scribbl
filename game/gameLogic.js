@@ -110,7 +110,7 @@ function selectingWord(roomCode) {
   clients[roomCode]["players"].forEach((player) => {
     if (
       player.id !==
-      clients[roomCode]["players"][clients[roomCode]["game"].drawing].id &&
+        clients[roomCode]["players"][clients[roomCode]["game"].drawing].id &&
       player.client &&
       player.client.readyState === WebSocket.OPEN
     ) {
@@ -125,7 +125,7 @@ function selectingWord(roomCode) {
       );
     } else if (
       player.id ===
-      clients[roomCode]["players"][clients[roomCode]["game"].drawing].id &&
+        clients[roomCode]["players"][clients[roomCode]["game"].drawing].id &&
       player.client &&
       player.client.readyState === WebSocket.OPEN
     ) {
@@ -155,7 +155,7 @@ function setCurrentWord(roomCode, word) {
   clients[roomCode]["players"].forEach((player) => {
     if (
       clients[roomCode]["players"].indexOf(player) !==
-      clients[roomCode]["game"].drawing &&
+        clients[roomCode]["game"].drawing &&
       player.client &&
       player.client.readyState === WebSocket.OPEN
     ) {
@@ -170,7 +170,7 @@ function setCurrentWord(roomCode, word) {
       );
     } else if (
       clients[roomCode]["players"].indexOf(player) ===
-      clients[roomCode]["game"].drawing &&
+        clients[roomCode]["game"].drawing &&
       player.client &&
       player.client.readyState === WebSocket.OPEN
     ) {
@@ -189,6 +189,7 @@ function setCurrentWord(roomCode, word) {
 
 function displayResult(roomCode) {
   if (!clients[roomCode]) return;
+  clients[roomCode]["game"].currentWord = "";
   clients[roomCode]["game"].status = "DisplayingResult";
   clients[roomCode]["game"].startTime = Date.now();
   clearTimeout(clients[roomCode]["game"].countDown);

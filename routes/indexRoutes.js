@@ -1,15 +1,23 @@
 const clients = require("../store");
-const { formatPlayers, formatGame, createRoomLink } = require("../utils/helpers");
+const {
+  formatPlayers,
+  formatGame,
+  createRoomLink,
+} = require("../utils/helpers");
 
 function setupRoutes(app) {
   app.get("/:roomCode", (req, res) => {
     const roomCode = req.params.roomCode;
     if (roomCode in clients) {
       if (!req.session) {
-          req.session = {}; // in case of error
+        req.session = {}; // in case of error
       }
-      
-      if (!req.cookies || !req.cookies.username || req.cookies.roomCode !== roomCode) {
+
+      if (
+        !req.cookies ||
+        !req.cookies.username ||
+        req.cookies.roomCode !== roomCode
+      ) {
         return res.redirect(`/?room=${roomCode}`);
       }
 
@@ -44,7 +52,7 @@ function setupRoutes(app) {
       countDown: "",
       drawing: -1,
       status: "",
-      currentWord: "default",
+      currentWord: "",
       round: 1,
       solved: new Set(),
       scores: {},

@@ -1,8 +1,18 @@
 const { WebSocket } = require("ws");
 const cookie = require("cookie");
 const clients = require("../store");
-const { formatPlayers, formatGame, calculateScore, getTime } = require("../utils/helpers");
-const { startGame, setCurrentWord, displayResult, checkIfGameOver } = require("../game/gameLogic");
+const {
+  formatPlayers,
+  formatGame,
+  calculateScore,
+  getTime,
+} = require("../utils/helpers");
+const {
+  startGame,
+  setCurrentWord,
+  displayResult,
+  checkIfGameOver,
+} = require("../game/gameLogic");
 
 function onConnect(socket, roomCode) {
   const player = clients[roomCode]["players"].find((p) => p.id === socket.id);
@@ -168,7 +178,9 @@ function handleSockets(wss) {
         return;
       }
 
-      if (["drawStart", "draw", "drawEnd", "undo", "clear"].includes(data.type)) {
+      if (
+        ["drawStart", "draw", "drawEnd", "undo", "clear"].includes(data.type)
+      ) {
         // Only the current drawer can send draw/undo/clear commands
         const game = clients[data.roomCode]["game"];
         const drawingIndex = game.drawing;
@@ -195,11 +207,22 @@ function handleSockets(wss) {
       if (data.type === "GetTime") return getTime(data.roomCode);
 
       if (
-        data.msg && typeof data.msg === "string" &&
+        data.msg &&
+        typeof data.msg === "string" &&
         data.msg.toLowerCase() ===
-        clients[data.roomCode]["game"].currentWord.toLowerCase()
+          clients[data.roomCode]["game"].currentWord.toLowerCase()
       ) {
         data.type = "Solved";
+        const elapsed = Math.floor(
+          (Date.now() - clients[data.roomCode]["game"].startTime) / 1000,
+        );
+        if (elapsed < 50 && !clients[data.roomCode]["game"]["solved"].size) {
+          data.type = "SolvedFirst";
+          clearTimeout(clients[roomCode]["game"].countDown);
+          clients[roomCode]["game"].countDown = setTimeout(() => {
+            displayResult(roomCode);
+          }, 30000);
+        }
         const id = data.id;
 
         if (!clients[data.roomCode]["game"]["solved"].has(id)) {
@@ -221,8 +244,8 @@ function handleSockets(wss) {
           if (drawingPlayer) {
             const drawerBonus = Math.floor(currentScore / 2);
             clients[data.roomCode]["game"]["scores"][drawingPlayer.id] =
-              (clients[data.roomCode]["game"]["scores"][drawingPlayer.id] || 0) +
-              drawerBonus;
+              (clients[data.roomCode]["game"]["scores"][drawingPlayer.id] ||
+                0) + drawerBonus;
           }
         }
         data.msg = `${socket.username} guessed the word!`;

@@ -127,6 +127,18 @@ body {
   font-weight: 700;
 }
 
+.round-sep-short {
+  display: none;
+}
+
+.round-sep-long {
+  display: inline;
+}
+
+.round-prefix {
+  display: inline;
+}
+
 /* ==================== Word Selection Buttons ==================== */
 #choose-words {
   display: flex;
@@ -164,33 +176,54 @@ body {
 .room-code-container {
   display: flex;
   align-items: center;
-  gap: 8px;
   background: var(--card-bg);
   border: 1px solid var(--panel-border);
   border-radius: 20px;
-  padding: 4px 12px 4px 16px;
+  padding: 4px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
-.room-code-icon {
-  font-size: 0.9rem;
+.room-code-container:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--accent-blue);
+  transform: translateY(-1px);
+}
+
+.room-code-container:active {
+  transform: translateY(0);
 }
 
 .room-code-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   background: transparent;
   border: none;
   outline: none;
   color: var(--text-primary);
-  font-family: 'Courier New', monospace;
+  font-family: inherit;
   font-weight: 700;
   font-size: 0.95rem;
   cursor: pointer;
   padding: 4px 0;
-  letter-spacing: 1px;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease;
 }
 
-.room-code-btn:hover {
+.room-code-container:hover .room-code-btn {
   color: var(--accent-blue);
+}
+
+.room-code-icon {
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+}
+
+.room-code-text {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 /* ==================== Game Layout ==================== */
@@ -893,17 +926,33 @@ tbody[style*="backgroundColor"] {
   }
 
   .room-code-container {
-    padding: 2px 8px 2px 10px;
+    padding: 4px 8px;
     border-radius: 14px;
   }
 
-  .room-code-icon {
-    font-size: 0.7rem;
+  .room-code-btn {
+    padding: 0;
+    gap: 0;
   }
 
-  .room-code-btn {
-    font-size: 0.7rem;
-    padding: 2px 0;
+  .room-code-icon {
+    font-size: 0.85rem;
+  }
+
+  .room-code-text {
+    display: none;
+  }
+
+  .round-prefix {
+    display: none;
+  }
+
+  .round-sep-long {
+    display: none;
+  }
+
+  .round-sep-short {
+    display: inline;
   }
 
   /* === Game Layout - Vertical Stack === */

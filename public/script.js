@@ -63,7 +63,9 @@ socket.onmessage = (event) => {
       addNewPlayer(window.currentPlayers || []);
     }
 
-    if (data.round) round.innerText = `Round ${data.round} of 3`;
+    if (data.round && round) {
+      round.innerHTML = `<span class="round-prefix">Round </span>${data.round}<span class="round-sep-long"> of </span><span class="round-sep-short">/</span>3`;
+    }
 
     if (data.type === "GameOver") {
       clearInterval(countdown);
@@ -98,7 +100,9 @@ socket.onmessage = (event) => {
       `);
 
       data.from = "SYSTEM";
-      round.innerText = "Round 0 of 3";
+      if (round) {
+        round.innerHTML = `<span class="round-prefix">Round </span>0<span class="round-sep-long"> of </span><span class="round-sep-short">/</span>3`;
+      }
       return;
     } else if (data.type === "DisplayingResult") {
       appendMessage("SYSTEM", data.msg, "round");

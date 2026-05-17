@@ -70,7 +70,8 @@
                     </div>
                     <div class="input-group">
                         <span class="input-icon">🔑</span>
-                        <input type="text" id="join-room-code" name="roomCode" placeholder="Room code..." required value="<%= locals.prefillRoom || '' %>">
+                        <input type="text" id="join-room-code" name="roomCode" placeholder="Room code..." required
+                            value="<%= locals.prefillRoom || '' %>">
                     </div>
                     <button type="submit" class="btn btn-join">
                         <span class="btn-text">Join Room</span>
@@ -86,13 +87,13 @@
         </footer>
     </div>
     <% if (locals.prefillRoom) { %>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('join-room-username').focus();
-            document.querySelector('.join-card').scrollIntoView({ behavior: 'smooth' });
-        });
-    </script>
-    <% } %>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                document.getElementById('join-room-username').focus();
+                document.querySelector('.join-card').scrollIntoView({ behavior: 'smooth' });
+            });
+        </script>
+        <% } %>
 </body>
 
 </html>

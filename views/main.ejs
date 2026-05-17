@@ -30,7 +30,9 @@
         </div>
         <div class="game-info-pill round-pill">
           <span class="pill-icon">🔄</span>
-          <span id="round">Round 0 of 3</span>
+          <span id="round">
+            <span class="round-prefix">Round </span>0<span class="round-sep-long"> of </span><span class="round-sep-short">/</span>3
+          </span>
         </div>
         <div id="choose-words">
           <% if (game.started) {%>
@@ -42,10 +44,10 @@
       </div>
     </div>
     <div class="top-bar-right">
-      <div id="room-code" class="room-code-container">
-        <span class="room-code-icon" title="Invite Link">🔗</span>
-        <button id="roomCode" class="room-code-btn" title="Click to copy invite link">
-          Share Invite Link
+      <div id="room-code" class="room-code-container" title="Click to copy invite link">
+        <button id="roomCode" class="room-code-btn">
+          <span class="room-code-icon">🔗</span>
+          <span class="room-code-text">Share Invite Link</span>
         </button>
       </div>
     </div>

@@ -15,7 +15,7 @@ Scribbl is designed as a **real-time distributed system** where multiple clients
 
 ---
 
-## ??? Architecture
+## Architecture
 
 
 Key principles:
@@ -26,53 +26,51 @@ Key principles:
 
 ---
 
-## ?? Tech Stack
+## Tech Stack
 
 - **Backend:** Node.js, Express.js  
 - **Real-time:** WebSockets (ws)  
-- **Caching / Sync:** Redis Pub/Sub (architecture-level design)  
 - **Frontend:** HTML5 Canvas, JavaScript  
 - **Database:** PostgreSQL (design-ready)  
 
 ---
 
-## ? Key Features
+## Key Features
 
-### ?? Real-Time Gameplay
+### Real-Time Gameplay
 - Instant drawing synchronization across clients
 - Bidirectional communication using WebSockets
 
-### ?? Room-Based Architecture
+### Room-Based Architecture
 - Isolated game sessions per room
 - Independent state management
 
-### ? Low-Latency Event System
+### Low-Latency Event System
 - Optimized event broadcasting
 - Minimal redundant updates
 
-### ?? Cross-Device Support
+### Cross-Device Support
 - Responsive canvas rendering
 - Touch input support for mobile devices
 
-### ?? Game Logic Engine
+### Game Logic Engine
 - Turn-based drawing system
 - Server-authoritative scoring
 - Leaderboard computation
 
 ---
 
-## ??? Scalability Design
+## Scalability Design
 
 The system is designed to scale horizontally:
 
 - Multiple WebSocket servers behind a load balancer
-- Redis Pub/Sub for cross-server event sync
 - Stateless backend nodes for easy scaling
 - Persistent storage for game history (future-ready)
 
 ---
 
-## ?? Reliability & Integrity
+## Reliability & Integrity
 
 - Server-side validation for all game actions
 - Prevention of unauthorized drawing
@@ -80,17 +78,14 @@ The system is designed to scale horizontally:
 
 ---
 
-## ?? Future Improvements
+## Future Improvements
 
-- Redis-based distributed state management
+- Redis-based distributed state management and Pub/Sub for cross-server event sync
 - Kafka-based event streaming for large-scale concurrency
-- Match history analytics dashboard
-- Global matchmaking system
-- Anti-cheat detection layer
 
 ---
 
-## ????? Author
+## Author
 
 Pankaj Jagadale  
 - GitHub: [@pankaj8128](https://github.com/pankaj8128)
@@ -98,7 +93,7 @@ Pankaj Jagadale
 
 ---
 
-## ? Purpose of Project
+## Purpose of Project
 
 This project was built to explore:
 - Real-time distributed systems
