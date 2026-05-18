@@ -189,6 +189,7 @@ function setCurrentWord(roomCode, word) {
 
 function displayResult(roomCode) {
   if (!clients[roomCode]) return;
+  const currentWord = clients[roomCode]["game"].currentWord;
   clients[roomCode]["game"].currentWord = "";
   clients[roomCode]["game"].status = "DisplayingResult";
   clients[roomCode]["game"].startTime = Date.now();
@@ -208,7 +209,7 @@ function displayResult(roomCode) {
       player.client.send(
         JSON.stringify({
           type: "DisplayingResult",
-          msg: `'${clients[roomCode]["game"].currentWord}' was the word.`,
+          msg: `'${currentWord}' was the word.`,
           players: formatPlayers(clients[roomCode]["players"]),
           roundScores: roundScores,
           word: clients[roomCode]["game"].currentWord,

@@ -267,8 +267,9 @@ function handleSockets(wss) {
       });
 
       if (
+        clients[data.roomCode]["game"].isStarted &&
         clients[data.roomCode]["game"]["solved"].size ===
-        clients[data.roomCode]["players"].length - 1
+          clients[data.roomCode]["players"].length - 1
       )
         displayResult(data.roomCode);
     });
