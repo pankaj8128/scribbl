@@ -56,6 +56,12 @@ function setupRoutes(app) {
       round: 1,
       solved: new Set(),
       scores: {},
+      settings: {
+        customWords: "",
+        rounds: 3,
+        drawTime: 80,
+        wordCount: 3,
+      },
     };
     clients[roomCode]["game"] = game;
     res.cookie("id", id, { path: "/" });

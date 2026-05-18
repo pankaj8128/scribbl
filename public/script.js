@@ -293,10 +293,10 @@ function showResultOverlay(players, roundScores, word, timeRemainingSecs = 5) {
       ${word ? `<div class="result-word-reveal">The word was: <span class="revealed-word">${word}</span></div>` : ""}
       <div class="result-players">
         ${players
-      .map((p, i) => {
-        const gained = roundScores[p.id] || 0;
-        const isMe = p.id === id;
-        return `
+          .map((p, i) => {
+            const gained = roundScores[p.id] || 0;
+            const isMe = p.id === id;
+            return `
               <div class="result-player-row ${isMe ? "result-me" : ""}" style="animation-delay: ${i * 0.1}s">
                 <div class="result-rank">${i + 1}</div>
                 <div class="result-name">${p.username}${isMe ? " (you)" : ""}</div>
@@ -304,8 +304,8 @@ function showResultOverlay(players, roundScores, word, timeRemainingSecs = 5) {
                 ${gained > 0 ? `<div class="result-gained">+${gained}</div>` : `<div class="result-gained zero">+0</div>`}
               </div>
             `;
-      })
-      .join("")}
+          })
+          .join("")}
       </div>
     </div>
   `;
@@ -608,10 +608,39 @@ startBtn.addEventListener("click", () => {
       msg: "Starting game...",
     });
     socket.send(payload);
+    hideCanvasOverlay();
+    hideSettingsOverlay();
   } else {
     appendMessage("SYSTEM", "Socket is not open", "error");
   }
 });
+
+const saveSettingsBtn = document.getElementById("save-settings-btn");
+if (saveSettingsBtn) {
+  saveSettingsBtn.addEventListener("click", () => {
+    const rounds = document.getElementById("setting-rounds").value;
+    const drawTime = document.getElementById("setting-drawTime").value;
+    const wordCount = document.getElementById("setting-wordCount").value;
+    const customWords = document.getElementById("setting-customWords").value;
+
+    if (socket.readyState === WebSocket.OPEN) {
+      const payload = JSON.stringify({
+        type: "UpdateSettings",
+        roomCode,
+        settings: {
+          rounds,
+          drawTime,
+          wordCount,
+          customWords,
+        },
+      });
+      socket.send(payload);
+      console.log("UpdateSettings: ", payload);
+    } else {
+      appendMessage("SYSTEM", "Socket is not open", "error");
+    }
+  });
+}
 
 sendBtn.addEventListener("click", sendMessage);
 

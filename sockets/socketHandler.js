@@ -76,7 +76,8 @@ function onConnect(socket, roomCode) {
         }),
       );
     } else if (game.status === "DrawingWord") {
-      const remaining = 80 - elapsed;
+      const drawTime = game.settings.drawTime || 80;
+      const remaining = drawTime - elapsed;
       socket.send(
         JSON.stringify({
           type: "GuessWord",
@@ -150,6 +151,31 @@ function handleSockets(wss) {
         const { resetGame } = require("../game/gameLogic"); // To prevent circular dependency at top level
         resetGame(roomCode);
         return startGame(roomCode);
+      }
+
+      if (data.type === "UpdateSettings") {
+        if (
+          clients[roomCode].players[0].id !== socket.id ||
+          clients[roomCode].game.isStarted
+        )
+          return;
+        clients[roomCode].game.settings = {
+          rounds: parseInt(data.settings.rounds) || 3,
+          drawTime: parseInt(data.settings.drawTime) || 80,
+          wordCount: parseInt(data.settings.wordCount) || 3,
+          customWords: data.settings.customWords || "",
+        };
+        clients[roomCode]["players"].forEach((player) => {
+          if (player.client && player.client.readyState === WebSocket.OPEN) {
+            player.client.send(
+              JSON.stringify({
+                type: "SettingsUpdated",
+                settings: clients[roomCode].game.settings,
+              }),
+            );
+          }
+        });
+        return;
       }
 
       if (data.type === "SetCurrentWord") {
@@ -234,6 +260,7 @@ function handleSockets(wss) {
             Date.now(),
             clients[data.roomCode]["game"].startTime,
             clients[data.roomCode]["game"]["solved"].size,
+            clients[data.roomCode]["game"].settings.drawTime || 80,
           );
           if (player)
             clients[data.roomCode]["game"]["scores"][player.id] = currentScore;

@@ -69,3 +69,25 @@ new player joined aftern match started =>
 edge cases:
 i) drawer exits
     socket.send(all) -> ${drawing} exited, 
+
+
+
+customs ->
+take input from owner:
+1) custom words? -> words
+2) rounds?(default 3)
+3) drawtime(default 80)
+4) word count(default 3)
+
+let words;
+if (customWords) {
+  words = req.body.words;
+  words = words
+    .split(",")
+    .map((word) => word.trim())
+    .filter((word) => word.length > 0);
+}
+if (customWords) {
+  game.customWords = true;
+  game.words = words;
+}

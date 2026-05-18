@@ -50,6 +50,34 @@ if (startBtn) {
         msg: "Starting game...",
       });
       socket.send(payload);
+      hideCanvasOverlay();
+      hideSettingsOverlay();
+    } else {
+      appendMessage("SYSTEM", "Socket is not open", "error");
+    }
+  });
+}
+
+const saveSettingsBtn = document.getElementById("save-settings-btn");
+if (saveSettingsBtn) {
+  saveSettingsBtn.addEventListener("click", () => {
+    const rounds = document.getElementById("setting-rounds").value;
+    const drawTime = document.getElementById("setting-drawTime").value;
+    const wordCount = document.getElementById("setting-wordCount").value;
+    const customWords = document.getElementById("setting-customWords").value;
+
+    if (socket.readyState === WebSocket.OPEN) {
+      const payload = JSON.stringify({
+        type: "UpdateSettings",
+        roomCode,
+        settings: {
+          rounds,
+          drawTime,
+          wordCount,
+          customWords,
+        },
+      });
+      socket.send(payload);
     } else {
       appendMessage("SYSTEM", "Socket is not open", "error");
     }

@@ -26,6 +26,7 @@ function formatGame(g, players) {
     status: g.status,
     solved: Array.from(g.solved),
     wordLength: g.currentWord.length,
+    settings: g.settings,
   };
 }
 
@@ -38,7 +39,7 @@ function createRoomLink() {
   return link;
 }
 
-function getWords() {
+function getWords(excludeWords = []) {
   try {
     if (!cachedWords) {
       let data = fs.readFileSync("words.txt", "utf8");
@@ -49,24 +50,39 @@ function getWords() {
       if (cachedWords.length < 3) cachedWords = ["Home", "Traffic", "School"];
     }
 
-    const words = [];
-    let attempts = 0;
-    while (words.length < 3 && attempts < 50) {
-      let word = cachedWords[Math.floor(Math.random() * cachedWords.length)];
-      if (words.indexOf(word) == -1) words.push(word);
-      attempts++;
-    }
-    return words;
+    // Return the full array instead of random sampling here, so getCustomWords can use it
+    return cachedWords;
   } catch (err) {
     return ["Home", "Traffic", "School"];
   }
 }
 
-function calculateScore(endTime, startTime, rank) {
-  const remainingTime = 80000 - (endTime - startTime);
+function getCustomWords(customWordsString, count = 3) {
+  let list = [];
+  if (customWordsString && typeof customWordsString === "string") {
+    list = customWordsString.split(",").map(w => w.trim()).filter(w => w.length > 0);
+  }
+  
+  if (list.length < 10) {
+    list = getWords();
+  }
+
+  const words = [];
+  let attempts = 0;
+  while (words.length < count && attempts < 50) {
+    let word = list[Math.floor(Math.random() * list.length)];
+    if (words.indexOf(word) === -1) words.push(word);
+    attempts++;
+  }
+  return words;
+}
+
+function calculateScore(endTime, startTime, rank, drawTime = 80) {
+  const maxTime = drawTime * 1000;
+  const remainingTime = maxTime - (endTime - startTime);
   if (remainingTime <= 0) return 0;
   const rankFactor = getRankFactor(rank);
-  const score = 450 * (remainingTime / 80000) * rankFactor;
+  const score = 450 * (remainingTime / maxTime) * rankFactor;
   return Math.round(score);
 }
 
@@ -108,6 +124,7 @@ module.exports = {
   formatGame,
   createRoomLink,
   getWords,
+  getCustomWords,
   calculateScore,
   getRankFactor,
   roomData,

@@ -20,8 +20,24 @@ socket.onmessage = (event) => {
 
     if (data.drawerId !== undefined) window.currentDrawerId = data.drawerId;
     if (data.players) window.currentPlayers = data.players;
-    if (data.game && data.game.drawerId !== undefined)
-      window.currentDrawerId = data.game.drawerId;
+    if (data.players) window.currentPlayers = data.players;
+    if (data.game) {
+      if (data.game.drawerId !== undefined)
+        window.currentDrawerId = data.game.drawerId;
+      if (data.game.settings) {
+        window.currentSettings = data.game.settings;
+        if (document.getElementById("setting-rounds")) {
+          document.getElementById("setting-rounds").value =
+            data.game.settings.rounds;
+          document.getElementById("setting-drawTime").value =
+            data.game.settings.drawTime;
+          document.getElementById("setting-wordCount").value =
+            data.game.settings.wordCount;
+          document.getElementById("setting-customWords").value =
+            data.game.settings.customWords;
+        }
+      }
+    }
 
     if (
       data.drawerId !== undefined ||
@@ -32,7 +48,9 @@ socket.onmessage = (event) => {
     }
 
     if (data.round && round) {
-      round.innerHTML = `<span class="round-prefix">Round </span>${data.round}<span class="round-sep-long"> of </span><span class="round-sep-short">/</span>3`;
+      const maxRounds =
+        (window.currentSettings && window.currentSettings.rounds) || 3;
+      round.innerHTML = `<span class="round-prefix">Round </span>${data.round}<span class="round-sep-long"> of </span><span class="round-sep-short">/</span>${maxRounds}`;
     }
 
     if (data.type === "GameOver") {
@@ -67,10 +85,17 @@ socket.onmessage = (event) => {
 
       data.from = "SYSTEM";
       if (round) {
-        round.innerHTML = `<span class="round-prefix">Round </span>0<span class="round-sep-long"> of </span><span class="round-sep-short">/</span>3`;
+        round.innerHTML = `<span class="round-prefix">Round </span>0<span class="round-sep-long"> of </span><span class="round-sep-short">/</span>${(window.currentSettings && window.currentSettings.rounds) || 3}`;
       }
+
+      setTimeout(() => {
+        hideCanvasOverlay();
+        showSettingsOverlay();
+      }, 5000);
+
       return;
     } else if (data.type === "DisplayingResult") {
+      hideSettingsOverlay();
       window.isDrawing = false;
       appendMessage("SYSTEM", data.msg, "round");
       const timeRemaining = data.time !== undefined ? data.time : 5;
@@ -92,6 +117,19 @@ socket.onmessage = (event) => {
     } else if (data.type === "GotNewOwner") {
       appendMessage("SYSTEM", data.msg, "owner");
       return;
+    } else if (data.type === "SettingsUpdated") {
+      window.currentSettings = data.settings;
+      if (document.getElementById("setting-rounds")) {
+        document.getElementById("setting-rounds").value = data.settings.rounds;
+        document.getElementById("setting-drawTime").value =
+          data.settings.drawTime;
+        document.getElementById("setting-wordCount").value =
+          data.settings.wordCount;
+        document.getElementById("setting-customWords").value =
+          data.settings.customWords;
+      }
+      appendMessage("SYSTEM", "Room settings updated.", "info");
+      return;
     } else if (data.type.startsWith("Solved")) {
       const playerRow = document.getElementById(`player-${data.id}`);
       if (playerRow) playerRow.style.background = "rgba(74, 222, 128, 0.2)";
@@ -109,6 +147,7 @@ socket.onmessage = (event) => {
           "Time over after shrink, waiting for server to response...",
         );
     } else if (data.type === "SelectWord") {
+      hideSettingsOverlay();
       appendMessage("SYSTEM", data.msg, "round");
       startTimer(
         data.time !== undefined ? data.time : 15,
@@ -153,6 +192,7 @@ socket.onmessage = (event) => {
       if (msgBox) msgBox.disabled = true;
       return;
     } else if (data.type === "StartGame") {
+      hideSettingsOverlay();
       appendMessage("SYSTEM", data.msg, "round");
       if (chooseWord) chooseWord.innerHTML = "";
       startTimer(
@@ -166,6 +206,7 @@ socket.onmessage = (event) => {
       `);
       return;
     } else if (data.type === "DrawWord") {
+      hideSettingsOverlay();
       hideCanvasOverlay();
       window.isDrawing = true;
       startTimer(
@@ -184,6 +225,7 @@ socket.onmessage = (event) => {
       enableDrawing();
       clearCanvas(false);
     } else if (data.type === "GuessWord") {
+      hideSettingsOverlay();
       hideCanvasOverlay();
       window.isDrawing = false;
       startTimer(

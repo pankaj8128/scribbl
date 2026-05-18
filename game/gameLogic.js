@@ -1,6 +1,11 @@
 const { WebSocket } = require("ws");
 const clients = require("../store");
-const { getWords, formatPlayers, formatGame } = require("../utils/helpers");
+const {
+  getWords,
+  getCustomWords,
+  formatPlayers,
+  formatGame,
+} = require("../utils/helpers");
 
 function startGame(roomCode) {
   if (!clients[roomCode] || !clients[roomCode]["players"]) return;
@@ -28,8 +33,9 @@ function startGame(roomCode) {
 
 function checkIfGameOver(roomCode) {
   if (!clients[roomCode] || !clients[roomCode]["game"].isStarted) return false;
+  const maxRounds = clients[roomCode]["game"].settings.rounds || 3;
   if (
-    clients[roomCode]["game"].round > 3 ||
+    clients[roomCode]["game"].round > maxRounds ||
     clients[roomCode]["players"].length <= 1
   ) {
     clearTimeout(clients[roomCode]["game"].countDown);
@@ -99,7 +105,9 @@ function getNextDrawer(roomCode) {
 function selectingWord(roomCode) {
   if (!clients[roomCode]) return;
   clients[roomCode]["game"].isStarted = true;
-  const words = getWords();
+  const customWordsInput = clients[roomCode]["game"].settings.customWords;
+  const wordCount = clients[roomCode]["game"].settings.wordCount || 3;
+  const words = getCustomWords(customWordsInput, wordCount);
   clients[roomCode]["game"].solved.clear();
   clients[roomCode]["game"].startTime = Date.now();
   clients[roomCode]["game"].status = "SelectingWord";
@@ -134,6 +142,7 @@ function selectingWord(roomCode) {
           type: "SelectWord",
           msg: "Select the word...",
           words,
+          time: 15,
           round: clients[roomCode]["game"].round,
           drawerId:
             clients[roomCode]["players"][clients[roomCode]["game"].drawing].id,
@@ -145,13 +154,14 @@ function selectingWord(roomCode) {
 
 function setCurrentWord(roomCode, word) {
   if (!clients[roomCode]) return;
+  const drawTime = clients[roomCode]["game"].settings.drawTime || 80;
   clearTimeout(clients[roomCode]["game"].countDown);
   clients[roomCode]["game"].currentWord = word;
   clients[roomCode]["game"].startTime = Date.now();
   clients[roomCode]["game"].status = "DrawingWord";
   clients[roomCode]["game"].countDown = setTimeout(() => {
     displayResult(roomCode);
-  }, 80000);
+  }, drawTime * 1000);
   clients[roomCode]["players"].forEach((player) => {
     if (
       clients[roomCode]["players"].indexOf(player) !==
@@ -164,6 +174,7 @@ function setCurrentWord(roomCode, word) {
           type: "GuessWord",
           msg: `Guess the word of length: ${word.length}`,
           length: word.length,
+          time: drawTime,
           drawerId:
             clients[roomCode]["players"][clients[roomCode]["game"].drawing].id,
         }),
@@ -178,6 +189,7 @@ function setCurrentWord(roomCode, word) {
         JSON.stringify({
           type: "DrawWord",
           word,
+          time: drawTime,
           msg: "Draw the word.",
           drawerId:
             clients[roomCode]["players"][clients[roomCode]["game"].drawing].id,
@@ -250,10 +262,16 @@ function resetGame(roomCode) {
     countDown: "",
     drawing: -1,
     status: "",
-    currentWord: "default",
+    currentWord: "",
     round: 1,
     solved: new Set(),
     scores: {},
+    settings: clients[roomCode]["game"].settings || {
+      customWords: "",
+      rounds: 3,
+      drawTime: 80,
+      wordCount: 3,
+    },
   };
 
   clients[roomCode]["players"].forEach((player) => {

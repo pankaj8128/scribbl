@@ -53,6 +53,16 @@ function hideCanvasOverlay() {
   if (existing) existing.remove();
 }
 
+function hideSettingsOverlay() {
+  const overlay = document.getElementById("settings-overlay");
+  if (overlay) overlay.style.display = "none";
+}
+
+function showSettingsOverlay() {
+  const overlay = document.getElementById("settings-overlay");
+  if (overlay) overlay.style.display = "flex";
+}
+
 function addNewPlayer(dataset) {
   if (!dataset || !dataset.length) return;
   const sortedPlayers = [...dataset].sort((a, b) => b.score - a.score);

@@ -58,6 +58,13 @@ Key principles:
 - Server-authoritative scoring
 - Leaderboard computation
 
+### Custom Game Settings
+- Configurable number of rounds per match
+- Adjustable draw time for finer difficulty control
+- Customizable word count options for the drawer
+- Custom word list injection (comma-separated)
+- Owner-only configurations visible to all players
+
 ---
 
 ## Scalability Design

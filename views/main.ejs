@@ -69,6 +69,30 @@
     <div class="main-game-container">
       <div class="canvas-wrapper">
         <canvas id="draw-container"></canvas>
+        <div id="settings-overlay" class="settings-overlay" style="display: <%= game.isStarted ? 'none' : 'flex' %>;">
+          <h2 class="settings-title">⚙️ Room Settings</h2>
+          <div class="settings-form">
+            <div class="setting-group">
+              <label for="setting-rounds">Rounds</label>
+              <input type="number" id="setting-rounds" value="<%= game.settings ? game.settings.rounds : 3 %>" min="1" max="10" <%= isOwner ? '' : 'disabled' %>>
+            </div>
+            <div class="setting-group">
+              <label for="setting-drawTime">Draw Time in sec</label>
+              <input type="number" id="setting-drawTime" value="<%= game.settings ? game.settings.drawTime : 80 %>" min="10" max="300" <%= isOwner ? '' : 'disabled' %>>
+            </div>
+            <div class="setting-group">
+              <label for="setting-wordCount">Word Count</label>
+              <input type="number" id="setting-wordCount" value="<%= game.settings ? game.settings.wordCount : 3 %>" min="1" max="5" <%= isOwner ? '' : 'disabled' %>>
+            </div>
+            <div class="setting-group">
+              <label for="setting-customWords">Custom Words (min 10, comma separated)</label>
+              <textarea id="setting-customWords" placeholder="e.g. apple, banana, car..." <%= isOwner ? '' : 'disabled' %>><%= game.settings ? game.settings.customWords : '' %></textarea>
+            </div>
+            <% if (isOwner) { %>
+              <button id="save-settings-btn" class="save-settings-btn">Save Settings</button>
+            <% } %>
+          </div>
+        </div>
       </div>
 
       <div class="controls">
