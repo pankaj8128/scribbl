@@ -459,23 +459,36 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 20px;
+  justify-content: flex-start;
+  padding: 24px 20px;
+  overflow-y: auto;
+}
+
+.settings-overlay::-webkit-scrollbar {
+  width: 6px;
+}
+.settings-overlay::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
 }
 
 .settings-title {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 900;
   color: var(--accent-yellow);
-  margin-bottom: 24px;
+  margin-bottom: 20px;
+  margin-top: auto;
+  flex-shrink: 0;
 }
 
 .settings-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
   width: 100%;
   max-width: 400px;
+  margin-bottom: auto;
+  flex-shrink: 0;
 }
 
 .setting-group {
@@ -1265,6 +1278,40 @@ tbody[style*="backgroundColor"] {
   .result-gained {
     font-size: 0.7rem;
     min-width: 36px;
+  }
+
+  /* === Settings Overlay Mobile === */
+  .settings-overlay {
+    padding: 16px 12px;
+  }
+
+  .settings-title {
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+  }
+
+  .settings-form {
+    gap: 10px;
+  }
+
+  .setting-group label {
+    font-size: 0.8rem;
+  }
+
+  .setting-group input,
+  .setting-group textarea {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+  }
+
+  .setting-group textarea {
+    min-height: 50px;
+  }
+
+  .save-settings-btn {
+    padding: 8px;
+    font-size: 0.9rem;
+    margin-top: 6px;
   }
 }
 
