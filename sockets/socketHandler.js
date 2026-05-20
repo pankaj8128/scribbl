@@ -239,10 +239,11 @@ function handleSockets(wss) {
           clients[data.roomCode]["game"].currentWord.toLowerCase()
       ) {
         data.type = "Solved";
+        const drawTime = clients[data.roomCode]["game"].settings.drawTime || 80;
         const elapsed = Math.floor(
           (Date.now() - clients[data.roomCode]["game"].startTime) / 1000,
         );
-        if (elapsed < 50 && !clients[data.roomCode]["game"]["solved"].size) {
+        if (drawTime - elapsed > 30 && !clients[data.roomCode]["game"]["solved"].size) {
           data.type = "SolvedFirst";
           clearTimeout(clients[roomCode]["game"].countDown);
           clients[roomCode]["game"].countDown = setTimeout(() => {

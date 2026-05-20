@@ -20,7 +20,6 @@ socket.onmessage = (event) => {
 
     if (data.drawerId !== undefined) window.currentDrawerId = data.drawerId;
     if (data.players) window.currentPlayers = data.players;
-    if (data.players) window.currentPlayers = data.players;
     if (data.game) {
       if (data.game.drawerId !== undefined)
         window.currentDrawerId = data.game.drawerId;
@@ -51,11 +50,28 @@ socket.onmessage = (event) => {
       const maxRounds =
         (window.currentSettings && window.currentSettings.rounds) || 3;
       round.innerHTML = `<span class="round-prefix">Round </span>${data.round}<span class="round-sep-long"> of </span><span class="round-sep-short">/</span>${maxRounds}`;
+
+      if (window.currentRound !== data.round) {
+        window.currentRound = data.round;
+        const announcementOverlay = document.getElementById("round-announcement-overlay");
+        const announcementText = document.getElementById("round-announcement-text");
+        if (announcementOverlay && announcementText) {
+          announcementText.innerText = "Round " + data.round;
+          announcementOverlay.style.display = "flex";
+          setTimeout(() => {
+            if (window.currentRound === data.round) {
+              announcementOverlay.style.display = "none";
+            }
+          }, 2000);
+        }
+      }
     }
 
     if (data.type === "GameOver") {
       window.isDrawing = false;
       clearInterval(countdown);
+      if (startBtn) startBtn.style.display = "flex";
+      if (msgBox) msgBox.disabled = false;
       appendMessage("SYSTEM", data.msg, "gameover");
 
       const sortedFinal = [...(data.players || [])].sort(
@@ -97,6 +113,7 @@ socket.onmessage = (event) => {
     } else if (data.type === "DisplayingResult") {
       hideSettingsOverlay();
       window.isDrawing = false;
+      if (msgBox) msgBox.disabled = false;
       appendMessage("SYSTEM", data.msg, "round");
       const timeRemaining = data.time !== undefined ? data.time : 5;
       showResultOverlay(
@@ -113,6 +130,14 @@ socket.onmessage = (event) => {
     } else if (data.type === "NewOwner") {
       appendMessage("SYSTEM", data.msg, "owner");
       if (startBtn) startBtn.disabled = false;
+      if (document.getElementById("setting-rounds")) {
+        document.getElementById("setting-rounds").disabled = false;
+        document.getElementById("setting-drawTime").disabled = false;
+        document.getElementById("setting-wordCount").disabled = false;
+        document.getElementById("setting-customWords").disabled = false;
+      }
+      const saveBtn = document.getElementById("save-settings-btn");
+      if (saveBtn) saveBtn.style.display = "block";
       return;
     } else if (data.type === "GotNewOwner") {
       appendMessage("SYSTEM", data.msg, "owner");
@@ -147,6 +172,7 @@ socket.onmessage = (event) => {
           "Time over after shrink, waiting for server to response...",
         );
     } else if (data.type === "SelectWord") {
+      if (startBtn) startBtn.style.display = "none";
       hideSettingsOverlay();
       appendMessage("SYSTEM", data.msg, "round");
       startTimer(
@@ -192,6 +218,7 @@ socket.onmessage = (event) => {
       if (msgBox) msgBox.disabled = true;
       return;
     } else if (data.type === "StartGame") {
+      if (startBtn) startBtn.style.display = "none";
       hideSettingsOverlay();
       appendMessage("SYSTEM", data.msg, "round");
       if (chooseWord) chooseWord.innerHTML = "";

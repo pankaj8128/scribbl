@@ -1527,3 +1527,30 @@ tbody[style*="backgroundColor"] {
     transform: scale(0.95);
   }
 }
+
+/* ==================== Round Announcement ==================== */
+.round-announcement-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(13, 27, 42, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-lg);
+  animation: overlayFadeIn 0.3s ease-out;
+}
+
+.round-announcement-overlay h1 {
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: var(--accent-yellow);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 4px 15px rgba(250, 204, 21, 0.5);
+  animation: gainPop 0.5s ease-out both;
+}

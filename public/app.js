@@ -50,8 +50,6 @@ if (startBtn) {
         msg: "Starting game...",
       });
       socket.send(payload);
-      hideCanvasOverlay();
-      hideSettingsOverlay();
     } else {
       appendMessage("SYSTEM", "Socket is not open", "error");
     }

@@ -88,10 +88,11 @@
               <label for="setting-customWords">Custom Words (min 10, comma separated)</label>
               <textarea id="setting-customWords" placeholder="e.g. apple, banana, car..." <%= isOwner ? '' : 'disabled' %>><%= game.settings ? game.settings.customWords : '' %></textarea>
             </div>
-            <% if (isOwner) { %>
-              <button id="save-settings-btn" class="save-settings-btn">Save Settings</button>
-            <% } %>
+            <button id="save-settings-btn" class="save-settings-btn" style="display: <%= isOwner ? 'block' : 'none' %>;">Save Settings</button>
           </div>
+        </div>
+        <div id="round-announcement-overlay" class="round-announcement-overlay" style="display: none;">
+          <h1 id="round-announcement-text">Round 1</h1>
         </div>
       </div>
 
@@ -105,7 +106,7 @@
           </button>
         </div>
         <div class="controls-right">
-          <button id="start" <%=isOwner ? "" : "disabled" %>>
+          <button id="start" <%=isOwner ? "" : "disabled" %> style="display: <%= game.isStarted ? 'none' : 'flex' %>;">
             <span class="start-icon">▶</span>
             Start Game
           </button>
