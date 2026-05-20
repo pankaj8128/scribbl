@@ -550,58 +550,19 @@ body {
   box-shadow: 0 4px 12px rgba(56, 189, 248, 0.4);
 }
 
-
-/* ==================== Controls ==================== */
-.controls {
+.settings-actions {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
   gap: 12px;
-  flex-shrink: 0;
+  width: 100%;
+  margin-top: 10px;
 }
-
-.controls-left {
-  display: flex;
-  gap: 8px;
-}
-
-.controls-right {
+.settings-actions button {
   flex: 1;
-  display: flex;
-  justify-content: flex-end;
+  margin-top: 0;
 }
 
-.ctrl-btn {
-  width: 42px;
-  height: 42px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #ffffff;
-  border: 1px solid var(--panel-border);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  padding: 0;
-}
 
-.ctrl-btn img {
-  width: 24px;
-  height: 24px;
-  opacity: 0.85;
-  transition: opacity 0.2s ease;
-}
-
-.ctrl-btn:hover {
-  background: #f1f5f9;
-  border-color: var(--accent-blue);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.ctrl-btn:hover img {
-  opacity: 1;
-}
+/* ==================== Game Start Button ==================== */
 
 #start {
   display: flex;
@@ -1108,26 +1069,7 @@ tbody[style*="backgroundColor"] {
     gap: 8px;
   }
 
-  /* Controls */
-  .controls {
-    gap: 6px;
-    flex-wrap: wrap;
-  }
 
-  .controls-left {
-    gap: 4px;
-  }
-
-  .ctrl-btn {
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-  }
-
-  .ctrl-btn img {
-    width: 18px;
-    height: 18px;
-  }
 
   #start {
     padding: 6px 14px;
@@ -1553,4 +1495,263 @@ tbody[style*="backgroundColor"] {
   letter-spacing: 2px;
   text-shadow: 0 4px 15px rgba(250, 204, 21, 0.5);
   animation: gainPop 0.5s ease-out both;
+}
+
+/* ==================== Drawing Toolbar ==================== */
+.drawing-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: #1b2838; /* A beautiful dark blue matching skribbl.io theme */
+  border-radius: var(--radius-lg);
+  padding: 12px 20px;
+  box-shadow: var(--shadow-md);
+  margin-top: 4px;
+  user-select: none;
+  flex-wrap: wrap; /* responsive */
+  border: 1px solid var(--panel-border);
+}
+
+/* Color Preview */
+.color-preview-box {
+  width: 48px;
+  height: 48px;
+  background: #ffffff;
+  border-radius: 6px;
+  padding: 3px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.color-preview-display {
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, var(--selected-color, #000000) 50%, #ffffff 50%);
+  transition: background 0.1s ease;
+}
+
+/* Color Palette Grid */
+.color-grid {
+  display: flex;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.color-column {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.color-btn {
+  width: 20px;
+  height: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  outline: none;
+}
+
+.color-btn:hover {
+  transform: scale(1.2);
+  z-index: 2;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.color-btn:active {
+  transform: scale(0.95);
+}
+
+/* Brush Sizes Panel */
+.brush-sizes {
+  display: flex;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  align-items: center;
+  height: 48px;
+}
+
+.size-btn {
+  width: 36px;
+  height: 36px;
+  background: #ffffff;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  transition: all 0.15s ease;
+}
+
+.size-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+  background: #f1f5f9;
+}
+
+.size-btn.active {
+  border-color: #38bdf8;
+  background: #e0f2fe;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+  transform: scale(1.05);
+}
+
+/* Dots inside size buttons */
+.size-dot {
+  background: #000000;
+  border-radius: 50%;
+  display: block;
+}
+
+.dot-sm { width: 4px; height: 4px; }
+.dot-md { width: 10px; height: 10px; }
+.dot-lg { width: 18px; height: 18px; }
+.dot-xl { width: 26px; height: 26px; }
+
+/* Action Tools (Brush, Fill, Undo, Clear) */
+.drawing-tools {
+  display: flex;
+  gap: 8px;
+}
+
+.tool-btn-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.tool-key {
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+}
+
+.action-btn {
+  width: 38px;
+  height: 38px;
+  background: #ffffff;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  color: #475569;
+  transition: all 0.15s ease;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+  color: #0f172a;
+  background: #f8fafc;
+}
+
+.action-btn.active {
+  background: #a78bfa; /* purple theme for tool select */
+  color: #ffffff;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.6);
+  transform: scale(1.05);
+}
+
+.tool-svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ==================== Drawing Toolbar Mobile ==================== */
+.brush-preview-box {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .drawing-toolbar {
+    gap: 6px;
+    padding: 6px;
+    position: relative;
+    justify-content: space-around;
+  }
+
+  .color-grid {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 10px;
+    background: #1b2838;
+    border: 1px solid var(--panel-border);
+    padding: 8px;
+    border-radius: 8px;
+    box-shadow: var(--shadow-lg);
+    z-index: 100;
+  }
+  .color-grid.show {
+    display: flex;
+  }
+
+  .brush-sizes {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 60px;
+    background: #1b2838;
+    border: 1px solid var(--panel-border);
+    padding: 8px;
+    border-radius: 8px;
+    box-shadow: var(--shadow-lg);
+    z-index: 100;
+  }
+  .brush-sizes.show {
+    display: flex;
+  }
+
+  .brush-preview-box {
+    display: flex;
+    width: 38px;
+    height: 38px;
+    background: #ffffff;
+    border-radius: 6px;
+    padding: 3px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.2);
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  
+  .color-preview-box {
+    width: 38px;
+    height: 38px;
+    cursor: pointer;
+  }
+  
+  .action-btn {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .tool-svg {
+    width: 16px;
+    height: 16px;
+  }
 }

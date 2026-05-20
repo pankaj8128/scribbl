@@ -205,7 +205,7 @@ function handleSockets(wss) {
       }
 
       if (
-        ["drawStart", "draw", "drawEnd", "undo", "clear"].includes(data.type)
+        ["drawStart", "draw", "drawEnd", "undo", "clear", "fill"].includes(data.type)
       ) {
         // Only the current drawer can send draw/undo/clear commands
         const game = clients[data.roomCode]["game"];

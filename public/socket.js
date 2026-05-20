@@ -69,6 +69,7 @@ socket.onmessage = (event) => {
 
     if (data.type === "GameOver") {
       window.isDrawing = false;
+      disableDrawing();
       clearInterval(countdown);
       if (startBtn) startBtn.style.display = "flex";
       if (msgBox) msgBox.disabled = false;
@@ -113,6 +114,7 @@ socket.onmessage = (event) => {
     } else if (data.type === "DisplayingResult") {
       hideSettingsOverlay();
       window.isDrawing = false;
+      disableDrawing();
       if (msgBox) msgBox.disabled = false;
       appendMessage("SYSTEM", data.msg, "round");
       const timeRemaining = data.time !== undefined ? data.time : 5;
@@ -277,6 +279,8 @@ socket.onmessage = (event) => {
       if (ctx && canvas) {
         const rx = data.x * canvas.width;
         const ry = data.y * canvas.height;
+        ctx.strokeStyle = data.color || "#000000";
+        ctx.lineWidth = data.thickness || 5;
         ctx.beginPath();
         ctx.moveTo(rx, ry);
       }
@@ -284,6 +288,8 @@ socket.onmessage = (event) => {
       if (ctx && canvas) {
         const rx = data.x * canvas.width;
         const ry = data.y * canvas.height;
+        ctx.strokeStyle = data.color || "#000000";
+        ctx.lineWidth = data.thickness || 5;
         ctx.lineTo(rx, ry);
         ctx.stroke();
         ctx.moveTo(rx, ry);
@@ -291,6 +297,15 @@ socket.onmessage = (event) => {
     } else if (data.type === "drawEnd") {
       if (ctx) {
         ctx.closePath();
+        saveState();
+      }
+    } else if (data.type === "fill") {
+      if (canvas && ctx) {
+        floodFill(
+          Math.round(data.x * canvas.width),
+          Math.round(data.y * canvas.height),
+          data.color
+        );
         saveState();
       }
     } else if (data.type === "undo") {
