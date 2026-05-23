@@ -44,6 +44,10 @@ socket.onmessage = (event) => {
       data.players
     ) {
       addNewPlayer(window.currentPlayers || []);
+      const currentCountElem = document.getElementById("waiting-current-count");
+      if (currentCountElem && window.currentPlayers) {
+        currentCountElem.innerText = window.currentPlayers.length;
+      }
     }
 
     if (data.round && round) {

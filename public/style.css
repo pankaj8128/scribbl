@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap");
 
 /* ==================== CSS Variables ==================== */
 :root {
@@ -41,7 +41,7 @@
 
 /* ==================== Body ==================== */
 body {
-  font-family: 'Nunito', sans-serif;
+  font-family: "Nunito", sans-serif;
   background: linear-gradient(180deg, #0d1b2a 0%, #1a1a3e 50%, #0d1b2a 100%);
   color: var(--text-primary);
   display: flex;
@@ -154,7 +154,7 @@ body {
   border-radius: 20px;
   cursor: pointer;
   font-weight: 800;
-  font-family: 'Nunito', sans-serif;
+  font-family: "Nunito", sans-serif;
   font-size: 0.9rem;
   transition: all 0.2s ease;
   letter-spacing: 2px;
@@ -181,7 +181,10 @@ body {
   border-radius: 20px;
   padding: 4px 16px;
   cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .room-code-container:hover {
@@ -221,7 +224,7 @@ body {
 }
 
 .room-code-text {
-  font-family: 'Nunito', sans-serif;
+  font-family: "Nunito", sans-serif;
   font-weight: 700;
   letter-spacing: 0.5px;
 }
@@ -297,9 +300,15 @@ body {
   flex-shrink: 0;
 }
 
-.player-entry:nth-child(1) .player-rank { color: var(--accent-yellow); }
-.player-entry:nth-child(2) .player-rank { color: #cbd5e1; }
-.player-entry:nth-child(3) .player-rank { color: var(--accent-orange); }
+.player-entry:nth-child(1) .player-rank {
+  color: var(--accent-yellow);
+}
+.player-entry:nth-child(2) .player-rank {
+  color: #cbd5e1;
+}
+.player-entry:nth-child(3) .player-rank {
+  color: var(--accent-orange);
+}
 
 .player-avatar {
   width: 34px;
@@ -340,8 +349,12 @@ body {
 }
 
 @keyframes bounce {
-  from { transform: translateY(0px) rotate(0deg); }
-  to { transform: translateY(-3px) rotate(15deg); }
+  from {
+    transform: translateY(0px) rotate(0deg);
+  }
+  to {
+    transform: translateY(-3px) rotate(15deg);
+  }
 }
 
 .player-score {
@@ -416,7 +429,7 @@ body {
   border: none;
   border-radius: var(--radius-lg);
   color: white;
-  font-family: 'Nunito', sans-serif;
+  font-family: "Nunito", sans-serif;
   font-weight: 900;
   font-size: 1.2rem;
   padding: 16px 32px;
@@ -542,7 +555,9 @@ body {
   font-size: 1rem;
   cursor: pointer;
   margin-top: 10px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .save-settings-btn:hover {
@@ -561,7 +576,6 @@ body {
   margin-top: 0;
 }
 
-
 /* ==================== Game Start Button ==================== */
 
 #start {
@@ -574,7 +588,7 @@ body {
   border-radius: var(--radius-sm);
   padding: 10px 28px;
   color: #0f172a;
-  font-family: 'Nunito', sans-serif;
+  font-family: "Nunito", sans-serif;
   font-weight: 800;
   font-size: 0.95rem;
   cursor: pointer;
@@ -793,10 +807,12 @@ body {
   padding: 10px 14px;
   color: var(--text-primary);
   border-radius: var(--radius-sm);
-  font-family: 'Nunito', sans-serif;
+  font-family: "Nunito", sans-serif;
   font-size: 0.9rem;
   font-weight: 600;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
   outline: none;
 }
 
@@ -813,34 +829,6 @@ body {
 .msgBox:disabled {
   opacity: 0.4;
   cursor: not-allowed;
-}
-
-.sendBtn {
-  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-  border: none;
-  width: 42px;
-  height: 42px;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-}
-
-.sendBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
-}
-
-.sendBtn:active {
-  transform: translateY(0) scale(0.95);
-}
-
-.send-icon {
-  color: white;
-  font-size: 1.1rem;
 }
 
 /* ==================== Override for script.js inline styles ==================== */
@@ -1069,8 +1057,6 @@ tbody[style*="backgroundColor"] {
     gap: 8px;
   }
 
-
-
   #start {
     padding: 6px 14px;
     font-size: 0.75rem;
@@ -1167,16 +1153,6 @@ tbody[style*="backgroundColor"] {
     font-size: 0.75rem;
     border-radius: 6px;
     border-width: 1.5px;
-  }
-
-  .sendBtn {
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-  }
-
-  .send-icon {
-    font-size: 0.85rem;
   }
 
   /* === Result Overlay Mobile === */
@@ -1520,7 +1496,9 @@ tbody[style*="backgroundColor"] {
   background: #ffffff;
   border-radius: 6px;
   padding: 3px;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.2);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.15),
+    0 2px 6px rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1532,7 +1510,11 @@ tbody[style*="backgroundColor"] {
   height: 100%;
   border-radius: 4px;
   border: 1px solid rgba(0, 0, 0, 0.15);
-  background: linear-gradient(135deg, var(--selected-color, #000000) 50%, #ffffff 50%);
+  background: linear-gradient(
+    135deg,
+    var(--selected-color, #000000) 50%,
+    #ffffff 50%
+  );
   transition: background 0.1s ease;
 }
 
@@ -1559,7 +1541,9 @@ tbody[style*="backgroundColor"] {
   border-radius: 3px;
   cursor: pointer;
   padding: 0;
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.1s ease;
   outline: none;
 }
 
@@ -1620,10 +1604,22 @@ tbody[style*="backgroundColor"] {
   display: block;
 }
 
-.dot-sm { width: 4px; height: 4px; }
-.dot-md { width: 10px; height: 10px; }
-.dot-lg { width: 18px; height: 18px; }
-.dot-xl { width: 26px; height: 26px; }
+.dot-sm {
+  width: 4px;
+  height: 4px;
+}
+.dot-md {
+  width: 10px;
+  height: 10px;
+}
+.dot-lg {
+  width: 18px;
+  height: 18px;
+}
+.dot-xl {
+  width: 26px;
+  height: 26px;
+}
 
 /* Action Tools (Brush, Fill, Undo, Clear) */
 .drawing-tools {
@@ -1733,25 +1729,87 @@ tbody[style*="backgroundColor"] {
     background: #ffffff;
     border-radius: 6px;
     padding: 3px;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.2);
+    box-shadow:
+      inset 0 2px 4px rgba(0, 0, 0, 0.15),
+      0 2px 6px rgba(0, 0, 0, 0.2);
     align-items: center;
     justify-content: center;
     cursor: pointer;
   }
-  
+
   .color-preview-box {
     width: 38px;
     height: 38px;
     cursor: pointer;
   }
-  
+
   .action-btn {
     width: 32px;
     height: 32px;
   }
-  
+
   .tool-svg {
     width: 16px;
     height: 16px;
   }
+}
+
+/* ==================== Public Room Waiting Lobby ==================== */
+.public-waiting-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 30px;
+  background: rgba(30, 41, 59, 0.4);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: var(--shadow-lg);
+  max-width: 400px;
+  width: 100%;
+  margin: auto;
+  animation: overlayFadeIn 0.5s ease-out;
+}
+
+.waiting-spinner {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  animation: bounce 1.5s infinite alternate;
+  display: inline-block;
+  color: var(--accent-yellow);
+}
+
+.waiting-title {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+}
+
+.waiting-desc {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+.waiting-count {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--accent-blue);
+  background: var(--input-bg);
+  border: 2px solid var(--input-border);
+  padding: 10px 24px;
+  border-radius: var(--radius-md);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.waiting-count #waiting-current-count {
+  color: var(--accent-green);
+  font-weight: 900;
 }

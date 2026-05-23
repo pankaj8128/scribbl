@@ -27,6 +27,7 @@ function formatGame(g, players) {
     solved: Array.from(g.solved),
     wordLength: g.currentWord.length,
     settings: g.settings,
+    isPublic: g.isPublic,
   };
 }
 

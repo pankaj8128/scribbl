@@ -28,10 +28,75 @@ function setupRoutes(app) {
           clients[roomCode]["game"],
           clients[roomCode]["players"],
         ),
-        isOwner: req.session.isOwner,
+        isOwner: clients[roomCode]["game"].isPublic ? false : req.session.isOwner,
       });
     }
     res.redirect("/");
+  });
+
+  app.post("/play-random", (req, res) => {
+    const username = req.body.username;
+    if (!username) return res.redirect("/");
+
+    const MAX_PUBLIC_ROOM_SIZE = 8;
+    let roomCode = null;
+
+    // Search for an existing public room with space
+    for (const code in clients) {
+      const room = clients[code];
+      if (room.game && room.game.isPublic && room.players.length < MAX_PUBLIC_ROOM_SIZE) {
+        roomCode = code;
+        break;
+      }
+    }
+
+    const id = createRoomLink();
+    const player = {
+      ip: req.ip,
+      id: id,
+      username: username,
+      score: 0,
+    };
+
+    if (roomCode) {
+      // Join existing room
+      clients[roomCode]["players"].push(player);
+      res.cookie("id", id, { path: "/" });
+      res.cookie("username", username, { path: "/" });
+      res.cookie("roomCode", roomCode, { path: "/" });
+      if (!req.session) req.session = {};
+      req.session.isOwner = false;
+      res.redirect(`/${roomCode}`);
+    } else {
+      // Create new public room
+      roomCode = createRoomLink();
+      clients[roomCode] = { players: [player] };
+      const game = {
+        isStarted: false,
+        startTime: Date.now(),
+        countDown: "",
+        drawing: -1,
+        status: "",
+        currentWord: "",
+        round: 1,
+        solved: new Set(),
+        scores: {},
+        isPublic: true, // Flag this room as public/random matchmaking
+        settings: {
+          customWords: "",
+          rounds: 3,
+          drawTime: 80,
+          wordCount: 3,
+        },
+      };
+      clients[roomCode]["game"] = game;
+      res.cookie("id", id, { path: "/" });
+      res.cookie("username", username, { path: "/" });
+      res.cookie("roomCode", roomCode, { path: "/" });
+      if (!req.session) req.session = {};
+      req.session.isOwner = false; // No owner in public rooms!
+      res.redirect(`/${roomCode}`);
+    }
   });
 
   app.post("/create-room", (req, res) => {

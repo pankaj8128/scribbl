@@ -62,7 +62,20 @@ function checkIfGameOver(roomCode) {
         );
       }
     });
+    const isPublic = clients[roomCode]["game"].isPublic;
     resetGame(roomCode);
+
+    if (isPublic && clients[roomCode]["players"].length >= 2) {
+      setTimeout(() => {
+        if (
+          clients[roomCode] &&
+          !clients[roomCode]["game"].isStarted &&
+          clients[roomCode]["players"].length >= 2
+        ) {
+          startGame(roomCode);
+        }
+      }, 10000);
+    }
     return true;
   }
   return false;
@@ -256,6 +269,7 @@ function applyRoundScores(roomCode, roundScores) {
 
 function resetGame(roomCode) {
   if (!clients[roomCode]) return;
+  const isPublic = clients[roomCode]["game"].isPublic;
   clients[roomCode]["game"] = {
     isStarted: false,
     startTime: Date.now(),
@@ -266,6 +280,7 @@ function resetGame(roomCode) {
     round: 1,
     solved: new Set(),
     scores: {},
+    isPublic: isPublic,
     settings: clients[roomCode]["game"].settings || {
       customWords: "",
       rounds: 3,

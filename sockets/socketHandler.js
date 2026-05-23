@@ -49,19 +49,20 @@ function onConnect(socket, roomCode) {
     }
   });
 
-  const msg =
-    socket.id === clients[roomCode]["players"][0].id
-      ? "You are the room owner now!"
-      : `${clients[roomCode]["players"][0].username} is now the room owner!`;
-  socket.send(
-    JSON.stringify({
-      type: "SYSTEM",
-      msgStyle: "owner",
-      msg,
-    }),
-  );
-
   const game = clients[roomCode]["game"];
+  if (!game.isPublic) {
+    const msg =
+      socket.id === clients[roomCode]["players"][0].id
+        ? "You are the room owner now!"
+        : `${clients[roomCode]["players"][0].username} is now the room owner!`;
+    socket.send(
+      JSON.stringify({
+        type: "SYSTEM",
+        msgStyle: "owner",
+        msg,
+      }),
+    );
+  }
   if (game.isStarted) {
     const elapsed = Math.floor((Date.now() - game.startTime) / 1000);
     if (game.status === "SelectingWord") {
@@ -114,6 +115,18 @@ function onConnect(socket, roomCode) {
       );
     }
   }
+
+  if (game.isPublic && !game.isStarted && clients[roomCode]["players"].length >= 2) {
+    setTimeout(() => {
+      if (
+        clients[roomCode] &&
+        !clients[roomCode]["game"].isStarted &&
+        clients[roomCode]["players"].length >= 2
+      ) {
+        startGame(roomCode);
+      }
+    }, 1000);
+  }
 }
 
 function handleSockets(wss) {
@@ -143,6 +156,7 @@ function handleSockets(wss) {
 
       if (data.type === "StartGame") {
         const roomCode = data.roomCode;
+        if (clients[roomCode].game.isPublic) return;
         if (
           clients[roomCode].players[0].id !== socket.id ||
           clients[roomCode].game.isStarted
@@ -154,6 +168,7 @@ function handleSockets(wss) {
       }
 
       if (data.type === "UpdateSettings") {
+        if (clients[roomCode].game.isPublic) return;
         if (
           clients[roomCode].players[0].id !== socket.id ||
           clients[roomCode].game.isStarted
@@ -364,28 +379,30 @@ function handleSockets(wss) {
       if (playerIndex !== 0) return;
 
       if (clients[roomCode]["players"].length >= 1) {
-        if (
-          clients[roomCode]["players"][0].client &&
-          clients[roomCode]["players"][0].client.readyState === WebSocket.OPEN
-        ) {
-          clients[roomCode]["players"][0].client.send(
-            JSON.stringify({
-              type: "NewOwner",
-              msg: "You are now the proud owner of this room!",
-            }),
-          );
-        }
-        for (let i = 1; i < clients[roomCode]["players"].length; i++) {
+        if (!clients[roomCode]["game"].isPublic) {
           if (
-            clients[roomCode]["players"][i].client &&
-            clients[roomCode]["players"][i].client.readyState === WebSocket.OPEN
+            clients[roomCode]["players"][0].client &&
+            clients[roomCode]["players"][0].client.readyState === WebSocket.OPEN
           ) {
-            clients[roomCode]["players"][i].client.send(
+            clients[roomCode]["players"][0].client.send(
               JSON.stringify({
-                type: "GotNewOwner",
-                msg: `${clients[roomCode]["players"][0].username} is now the room owner!`,
+                type: "NewOwner",
+                msg: "You are now the proud owner of this room!",
               }),
             );
+          }
+          for (let i = 1; i < clients[roomCode]["players"].length; i++) {
+            if (
+              clients[roomCode]["players"][i].client &&
+              clients[roomCode]["players"][i].client.readyState === WebSocket.OPEN
+            ) {
+              clients[roomCode]["players"][i].client.send(
+                JSON.stringify({
+                  type: "GotNewOwner",
+                  msg: `${clients[roomCode]["players"][0].username} is now the room owner!`,
+                }),
+              );
+            }
           }
         }
       } else {
