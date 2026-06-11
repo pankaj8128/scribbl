@@ -100,7 +100,7 @@ socket.onmessage = (event) => {
           <div class="result-players" style="max-height: 350px; overflow-y: auto;">
             ${leaderboardHtml}
           </div>
-          <p style="margin-top: 24px; color: var(--text-muted); font-weight: 700;">Waiting for owner to start a new game...</p>
+          ${window.isPublic ? "" : '<p style="margin-top: 24px; color: var(--text-muted); font-weight: 700;">Waiting for owner to start a new game...</p>'}
         </div>
       `);
 
@@ -169,7 +169,13 @@ socket.onmessage = (event) => {
         chooseWord.innerHTML = "";
         const button = document.createElement("button");
         button.classList.add("word", "word-solved");
-        button.innerText = data.word;
+        
+        const words = data.word.split(" ");
+        const segmentsHtml = words.map(w => {
+          return `${w}<sup class="word-len-hint" style="font-size: 0.6rem; opacity: 0.8; font-weight: 800; vertical-align: super; margin-left: 1px;">${w.length}</sup>`;
+        }).join('&nbsp;&nbsp;&nbsp;&nbsp;');
+        
+        button.innerHTML = segmentsHtml;
         chooseWord.appendChild(button);
       }
       if (data.type.endsWith("First"))
@@ -180,7 +186,6 @@ socket.onmessage = (event) => {
     } else if (data.type === "SelectWord") {
       if (startBtn) startBtn.style.display = "none";
       hideSettingsOverlay();
-      appendMessage("SYSTEM", data.msg, "round");
       startTimer(
         data.time !== undefined ? data.time : 15,
         "Time to SelectWord is over, waiting for server to response...",
@@ -226,7 +231,6 @@ socket.onmessage = (event) => {
     } else if (data.type === "StartGame") {
       if (startBtn) startBtn.style.display = "none";
       hideSettingsOverlay();
-      appendMessage("SYSTEM", data.msg, "round");
       if (chooseWord) chooseWord.innerHTML = "";
       startTimer(
         data.time !== undefined ? data.time : 15,
@@ -249,12 +253,16 @@ socket.onmessage = (event) => {
       if (chooseWord) {
         chooseWord.innerHTML = "";
         const button = document.createElement("button");
-        button.setAttribute("id", data.word);
         button.classList.add("word");
-        button.innerText = data.word;
+        
+        const words = data.word.split(" ");
+        const segmentsHtml = words.map(w => {
+          return `${w}<sup class="word-len-hint" style="font-size: 0.6rem; opacity: 0.8; font-weight: 800; vertical-align: super; margin-left: 1px;">${w.length}</sup>`;
+        }).join('&nbsp;&nbsp;&nbsp;&nbsp;');
+        
+        button.innerHTML = segmentsHtml;
         chooseWord.appendChild(button);
       }
-      appendMessage("SYSTEM", data.msg, "round");
       enableDrawing();
       clearCanvas(false);
     } else if (data.type === "GuessWord") {
@@ -265,14 +273,18 @@ socket.onmessage = (event) => {
         data.time !== undefined ? data.time : 80,
         "Time to GuessWord is over, waiting for server to response...",
       );
-      const word = "_ ".repeat(data.length);
-      appendMessage("SYSTEM", data.msg, "round");
       if (chooseWord) {
         chooseWord.innerHTML = "";
         const button = document.createElement("button");
-        button.setAttribute("id", word);
         button.classList.add("word");
-        button.innerText = word;
+        
+        const lengths = data.wordLengths || [data.length];
+        const segmentsHtml = lengths.map(len => {
+          const underscores = "_ ".repeat(len).trim();
+          return `${underscores}<sup class="word-len-hint" style="font-size: 0.6rem; opacity: 0.8; font-weight: 800; vertical-align: super; margin-left: 1px;">${len}</sup>`;
+        }).join('&nbsp;&nbsp;&nbsp;&nbsp;');
+        
+        button.innerHTML = segmentsHtml;
         chooseWord.appendChild(button);
       }
       disableDrawing();

@@ -201,3 +201,28 @@ Window
 Wrench
 Yo-yo
 Zebra
+Hot dog
+Toy car
+Big cat
+Red cup
+Sun hat
+Ice cup
+Key ring
+Blue pen
+Sea star
+Sad face
+Old book
+Wet soap
+Red bird
+Tall tree
+Cold milk
+Gold ring
+Cute dog
+Sour lime
+Fast car
+Tiny ant
+Fire box
+Mud bath
+Fish net
+Wood box
+Rose bud

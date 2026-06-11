@@ -1,16 +1,22 @@
 function showResultOverlay(players, roundScores, word, timeRemainingSecs = 5) {
-  const container = document.querySelector(".main-game-container");
+  const container = document.querySelector(".game-layout");
   const existing = document.getElementById("result-overlay");
   if (existing) existing.remove();
+
+  // Sort players by their new score (current score + gained round score)
+  const sortedPlayers = [...players].map(p => ({
+    ...p,
+    newScore: p.score + (roundScores[p.id] || 0)
+  })).sort((a, b) => b.newScore - a.newScore);
 
   const overlay = document.createElement("div");
   overlay.id = "result-overlay";
   overlay.innerHTML = `
     <div class="result-overlay-inner">
-      <h2 class="result-title">🎯 Round Results</h2>
+      <h2 class="result-title">Round Results</h2>
       ${word ? `<div class="result-word-reveal">The word was: <span class="revealed-word">${word}</span></div>` : ""}
       <div class="result-players">
-        ${players
+        ${sortedPlayers
           .map((p, i) => {
             const gained = roundScores[p.id] || 0;
             const isMe = p.id === id;
@@ -18,7 +24,7 @@ function showResultOverlay(players, roundScores, word, timeRemainingSecs = 5) {
               <div class="result-player-row ${isMe ? "result-me" : ""}" style="animation-delay: ${i * 0.1}s">
                 <div class="result-rank">${i + 1}</div>
                 <div class="result-name">${p.username}${isMe ? " (you)" : ""}</div>
-                <div class="result-score">${p.score}</div>
+                <div class="result-score">${p.newScore}</div>
                 ${gained > 0 ? `<div class="result-gained">+${gained}</div>` : `<div class="result-gained zero">+0</div>`}
               </div>
             `;
@@ -114,20 +120,7 @@ function appendMessage(from = "SYSTEM", content, type = "chat") {
   ].includes(type);
 
   if (isSystem) {
-    const icon =
-      {
-        success: "✅",
-        error: "❌",
-        join: "🟢",
-        leave: "🔴",
-        round: "🎯",
-        gameover: "🏆",
-        owner: "👑",
-        warning: "⚠️",
-        info: "ℹ️",
-        solved: "✔️",
-      }[type] || "";
-    msgElement.innerHTML = `<span class="msg-icon">${icon}</span><span class="msg-content">${content}</span>`;
+    msgElement.innerHTML = `<span class="msg-content">${content}</span>`;
   } else {
     msgElement.innerHTML = `<span class="msg-user">${from}:</span> <span class="msg-content">${content}</span>`;
   }
@@ -141,10 +134,10 @@ function appendMessage(from = "SYSTEM", content, type = "chat") {
 function startTimer(time, msg) {
   clearInterval(countdown);
   let timeLeft = time;
-  if(timer) timer.textContent = timeLeft;
+  if (timer) timer.textContent = timeLeft;
   countdown = setInterval(() => {
     timeLeft--;
-    if(timer) timer.textContent = timeLeft;
+    if (timer) timer.textContent = timeLeft;
     if (timeLeft <= 0) {
       clearInterval(countdown);
       console.log(msg);

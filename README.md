@@ -5,7 +5,8 @@ A scalable real-time multiplayer drawing and guessing game inspired by Skribbl.i
 ---
 
 ## Live Demo
-**[Scribbl Live Game Link](https://scribbl-2nmw.onrender.com/)**
+* **[Scribbl Live Game Link (Render)](https://scribbl-2nmw.onrender.com/)**
+* **[Scribbl Alternate Link](https://scribbl.panky.qzz.io)**
 
 ---
 

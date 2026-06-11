@@ -19,13 +19,6 @@ function startGame(roomCode) {
     );
     return;
   }
-  clients[roomCode]["players"].forEach((player) => {
-    if (player.client && player.client.readyState === WebSocket.OPEN) {
-      player.client.send(
-        JSON.stringify({ type: "SYSTEM", msg: "Starting game..." }),
-      );
-    }
-  });
   if (getNextDrawer(roomCode) === -1) return;
   if (checkIfGameOver(roomCode)) return;
   return selectingWord(roomCode);
@@ -187,6 +180,7 @@ function setCurrentWord(roomCode, word) {
           type: "GuessWord",
           msg: `Guess the word of length: ${word.length}`,
           length: word.length,
+          wordLengths: word.split(" ").map(w => w.length),
           time: drawTime,
           drawerId:
             clients[roomCode]["players"][clients[roomCode]["game"].drawing].id,

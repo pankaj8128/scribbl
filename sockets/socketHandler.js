@@ -84,6 +84,7 @@ function onConnect(socket, roomCode) {
           type: "GuessWord",
           msg: `Guess the word of length: ${game.currentWord.length}`,
           length: game.currentWord.length,
+          wordLengths: game.currentWord.split(" ").map(w => w.length),
           drawerId: clients[roomCode]["players"][game.drawing].id,
           time: remaining > 0 ? remaining : 0,
         }),
@@ -302,7 +303,7 @@ function handleSockets(wss) {
             id: data.id,
             msg: data.msg,
           };
-          if (data.type === "Solved" && player.id === data.id) {
+          if ((data.type === "Solved" || data.type === "SolvedFirst") && player.id === data.id) {
             payload.word = clients[data.roomCode]["game"].currentWord;
           }
           player.client.send(JSON.stringify(payload));
