@@ -115,8 +115,16 @@ function fillCanvas(x, y, color, emit = true) {
 
 function toggleDrawingToolbar(show) {
   const toolbar = document.getElementById("drawing-toolbar");
+  const layout = document.querySelector(".game-layout");
   if (toolbar) {
     toolbar.style.display = show ? "flex" : "none";
+  }
+  if (layout) {
+    if (show) {
+      layout.classList.remove("no-tools");
+    } else {
+      layout.classList.add("no-tools");
+    }
   }
 }
 

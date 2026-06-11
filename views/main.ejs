@@ -5,12 +5,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Scribbl - Game Room</title>
-  <link rel="icon" type="image/png" href="/images/logo.png">
   <meta name="description" content="Scribbl game room - Draw, guess and compete with friends!">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <script>
+    window.isPublic = <%= game.isPublic ? 'true' : 'false' %>;
+  </script>
 </head>
 
 <body>
@@ -18,8 +20,16 @@
   <!-- Top Bar -->
   <div class="top-bar">
     <div class="top-bar-left">
-      <a href="/">
-        <img src="/images/scribbl_logo.png" alt="Scribbl" class="top-logo">
+      <a href="/" style="text-decoration: none;">
+        <span class="mini-logo">
+          <span class="letter-s">S</span>
+          <span class="letter-c">c</span>
+          <span class="letter-r">r</span>
+          <span class="letter-i">i</span>
+          <span class="letter-b">b</span>
+          <span class="letter-b">b</span>
+          <span class="letter-l">l</span>
+        </span>
       </a>
     </div>
     <div class="top-bar-center">
@@ -31,15 +41,15 @@
         <div class="game-info-pill round-pill">
           <span class="pill-icon">🔄</span>
           <span id="round">
-            <span class="round-prefix">Round </span>0<span class="round-sep-long"> of </span><span class="round-sep-short">/</span>3
+            <span class="round-prefix">Round </span><%= game.round %><span class="round-sep-long"> of </span><span class="round-sep-short">/</span><%= game.settings.rounds %>
           </span>
         </div>
         <div id="choose-words">
-          <% if (game.started) {%>
+          <% if (game.isStarted && game.wordLength) {%>
             <button class="word">
-              <%= "_ " .repeat(game.currentWord.length) %>
+              <%= "_ ".repeat(game.wordLength).trim() %>
             </button>
-            <% } %>
+          <% } %>
         </div>
       </div>
     </div>
@@ -54,7 +64,7 @@
   </div>
 
   <!-- Main Content -->
-  <div class="game-layout">
+  <div class="game-layout no-tools">
 
     <!-- Left: Player List -->
     <div class="player-list-container">
@@ -66,8 +76,7 @@
     </div>
 
     <!-- Center: Canvas -->
-    <div class="main-game-container">
-      <div class="canvas-wrapper">
+    <div class="canvas-wrapper">
         <canvas id="draw-container"></canvas>
         <div id="settings-overlay" class="settings-overlay" style="display: <%= game.isStarted ? 'none' : 'flex' %>;">
           <% if (game.isPublic) { %>
@@ -196,6 +205,9 @@
 
         <!-- Brush Sizes -->
         <div class="brush-sizes" id="brush-sizes-panel">
+          <button class="size-btn" data-size="2" title="Ultra Thin (2px)">
+            <span class="size-dot dot-xs"></span>
+          </button>
           <button class="size-btn active" data-size="5" title="Small (5px)">
             <span class="size-dot dot-sm"></span>
           </button>
@@ -250,9 +262,6 @@
         </div>
       </div>
 
-
-    </div>
-
     <!-- Right: Chat -->
     <div id="chat-container">
       <div class="panel-header">
@@ -260,9 +269,9 @@
         <span class="panel-title">Chat</span>
       </div>
       <div class="chat-messages" id="chat-messages"></div>
-      <div class="input-wrapper">
-        <input type="text" class="msgBox" placeholder="Type your guess...">
-      </div>
+    </div>
+    <div class="input-wrapper">
+      <input type="text" class="msgBox" placeholder="Type your guess...">
     </div>
 
   </div>
