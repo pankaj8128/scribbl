@@ -133,6 +133,9 @@ socket.onmessage = (event) => {
         "Time to DisplayingResult is over, waiting for server to response...",
       );
       return;
+    } else if (data.type === "Banned") {
+      window.location.href = "/?error=banned";
+      return;
     } else if (data.type === "NewOwner") {
       appendMessage("SYSTEM", data.msg, "owner");
       if (startBtn) startBtn.disabled = false;

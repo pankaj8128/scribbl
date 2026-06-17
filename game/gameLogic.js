@@ -180,7 +180,7 @@ function setCurrentWord(roomCode, word) {
           type: "GuessWord",
           msg: `Guess the word of length: ${word.length}`,
           length: word.length,
-          wordLengths: word.split(" ").map(w => w.length),
+          wordLengths: word.split(" ").map((w) => w.length),
           time: drawTime,
           drawerId:
             clients[roomCode]["players"][clients[roomCode]["game"].drawing].id,
@@ -303,6 +303,79 @@ function resetGame(roomCode) {
   });
 }
 
+const REFILL_RATE = 1; // 1 token/sec
+const CAPACITY = 3;
+
+function allowRequest(roomCode, id) {
+  const player = clients[roomCode]["players"].find((p) => p.id === id);
+  if (!player) return false;
+
+  let bucket = player.bucket;
+
+  if (!bucket || typeof bucket.tokens === "undefined") {
+    bucket = {
+      tokens: CAPACITY,
+      lastRefill: Date.now(),
+    };
+    player.bucket = bucket;
+  }
+
+  const now = Date.now();
+
+  // Refill tokens based on elapsed time
+  const elapsed = (now - bucket.lastRefill) / 1000;
+  const tokensToAdd = elapsed * REFILL_RATE;
+
+  bucket.tokens = Math.min(CAPACITY, bucket.tokens + tokensToAdd);
+
+  bucket.lastRefill = now;
+
+  if (bucket.tokens >= 1) {
+    bucket.tokens -= 1;
+    return true; // allowed
+  }
+
+  return false; // rate limited
+}
+
+const WARNING_REFILL_RATE = 1 / 30; // 1 token every 30 seconds
+const MAX_WARNINGS = 2;
+
+function handleWarning(roomCode, id) {
+  const player = clients[roomCode]["players"].find((p) => p.id === id);
+  if (!player) return { allowed: false, remaining: 0 };
+
+  let warningBucket = player.warningBucket;
+
+  if (!warningBucket || typeof warningBucket.tokens === "undefined") {
+    warningBucket = {
+      tokens: MAX_WARNINGS,
+      lastRefill: Date.now(),
+    };
+    player.warningBucket = warningBucket;
+  }
+
+  const now = Date.now();
+  const elapsed = (now - warningBucket.lastRefill) / 1000;
+  const tokensToAdd = elapsed * WARNING_REFILL_RATE;
+
+  warningBucket.tokens = Math.min(MAX_WARNINGS, warningBucket.tokens + tokensToAdd);
+  warningBucket.lastRefill = now;
+
+  if (warningBucket.tokens >= 1) {
+    warningBucket.tokens -= 1;
+    return { allowed: true, remaining: Math.floor(warningBucket.tokens) };
+  } else {
+    if (player.ip) {
+      if (!clients[roomCode].bannedIPs) {
+        clients[roomCode].bannedIPs = new Set();
+      }
+      clients[roomCode].bannedIPs.add(player.ip);
+    }
+    return { allowed: false, remaining: 0 };
+  }
+}
+
 module.exports = {
   startGame,
   checkIfGameOver,
@@ -310,4 +383,6 @@ module.exports = {
   setCurrentWord,
   displayResult,
   resetGame,
+  allowRequest,
+  handleWarning,
 };

@@ -54,12 +54,14 @@
       </div>
     </div>
     <div class="top-bar-right">
-      <div id="room-code" class="room-code-container" title="Click to copy invite link">
-        <button id="roomCode" class="room-code-btn">
-          <span class="room-code-icon">🔗</span>
-          <span class="room-code-text">Share Invite Link</span>
-        </button>
-      </div>
+      <% if (!game.isPublic) { %>
+        <div id="room-code" class="room-code-container" title="Click to copy invite link">
+          <button id="roomCode" class="room-code-btn">
+            <span class="room-code-icon">🔗</span>
+            <span class="room-code-text">Share Invite Link</span>
+          </button>
+        </div>
+      <% } %>
     </div>
   </div>
 

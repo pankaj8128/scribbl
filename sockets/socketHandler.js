@@ -12,6 +12,8 @@ const {
   setCurrentWord,
   displayResult,
   checkIfGameOver,
+  allowRequest,
+  handleWarning,
 } = require("../game/gameLogic");
 
 function onConnect(socket, roomCode) {
@@ -84,7 +86,7 @@ function onConnect(socket, roomCode) {
           type: "GuessWord",
           msg: `Guess the word of length: ${game.currentWord.length}`,
           length: game.currentWord.length,
-          wordLengths: game.currentWord.split(" ").map(w => w.length),
+          wordLengths: game.currentWord.split(" ").map((w) => w.length),
           drawerId: clients[roomCode]["players"][game.drawing].id,
           time: remaining > 0 ? remaining : 0,
         }),
@@ -117,7 +119,11 @@ function onConnect(socket, roomCode) {
     }
   }
 
-  if (game.isPublic && !game.isStarted && clients[roomCode]["players"].length >= 2) {
+  if (
+    game.isPublic &&
+    !game.isStarted &&
+    clients[roomCode]["players"].length >= 2
+  ) {
     setTimeout(() => {
       if (
         clients[roomCode] &&
@@ -221,7 +227,9 @@ function handleSockets(wss) {
       }
 
       if (
-        ["drawStart", "draw", "drawEnd", "undo", "clear", "fill"].includes(data.type)
+        ["drawStart", "draw", "drawEnd", "undo", "clear", "fill"].includes(
+          data.type,
+        )
       ) {
         // Only the current drawer can send draw/undo/clear commands
         const game = clients[data.roomCode]["game"];
@@ -248,18 +256,74 @@ function handleSockets(wss) {
 
       if (data.type === "GetTime") return getTime(data.roomCode);
 
+      if (data.msg !== undefined) {
+        if (typeof data.msg === "string") {
+          const urlPattern = /(https?:\/\/[^\s]+)|(www\.[^\s]+)|([a-zA-Z0-9-]+\.(com|net|org|io|me|co|us|uk|info|biz|site|xyz|tv|edu|gov|ly|gl|gg|app|dev|sh|in)(?:\/[^\s]*)?)/gi;
+          if (urlPattern.test(data.msg)) {
+            const warning = handleWarning(data.roomCode, socket.id);
+            if (!warning.allowed) {
+              socket.send(
+                JSON.stringify({
+                  type: "Banned",
+                  msgStyle: "warning",
+                  msg: "You have been banned for sending promotional links.",
+                }),
+              );
+              socket.close();
+              return;
+            }
+
+            socket.send(
+              JSON.stringify({
+                type: "SYSTEM",
+                msgStyle: "warning",
+                msg: `Links and website promotions are not allowed in chat! Warnings remaining: ${warning.remaining}`,
+              }),
+            );
+            return;
+          }
+        }
+
+        if (!allowRequest(data.roomCode, socket.id)) {
+          const warning = handleWarning(data.roomCode, socket.id);
+          if (!warning.allowed) {
+            socket.send(
+              JSON.stringify({
+                type: "Banned",
+                msgStyle: "warning",
+                msg: "You have been banned for spamming.",
+              }),
+            );
+            socket.close();
+            return;
+          }
+
+          socket.send(
+            JSON.stringify({
+              type: "SYSTEM",
+              msgStyle: "warning",
+              msg: `You are sending messages too fast! Warnings remaining: ${warning.remaining}`,
+            }),
+          );
+          return;
+        }
+      }
+
       if (
         data.msg &&
         typeof data.msg === "string" &&
         data.msg.toLowerCase() ===
-          clients[data.roomCode]["game"].currentWord.toLowerCase()
+        clients[data.roomCode]["game"].currentWord.toLowerCase()
       ) {
         data.type = "Solved";
         const drawTime = clients[data.roomCode]["game"].settings.drawTime || 80;
         const elapsed = Math.floor(
           (Date.now() - clients[data.roomCode]["game"].startTime) / 1000,
         );
-        if (drawTime - elapsed > 30 && !clients[data.roomCode]["game"]["solved"].size) {
+        if (
+          drawTime - elapsed > 30 &&
+          !clients[data.roomCode]["game"]["solved"].size
+        ) {
           data.type = "SolvedFirst";
           clearTimeout(clients[roomCode]["game"].countDown);
           clients[roomCode]["game"].countDown = setTimeout(() => {
@@ -283,7 +347,7 @@ function handleSockets(wss) {
             clients[data.roomCode]["game"]["scores"][player.id] = currentScore;
           const drawingPlayer =
             clients[data.roomCode]["players"][
-              clients[data.roomCode]["game"].drawing
+            clients[data.roomCode]["game"].drawing
             ];
           if (drawingPlayer) {
             const drawerBonus = Math.floor(currentScore / 2);
@@ -303,17 +367,21 @@ function handleSockets(wss) {
             id: data.id,
             msg: data.msg,
           };
-          if ((data.type === "Solved" || data.type === "SolvedFirst") && player.id === data.id) {
+          if (
+            (data.type === "Solved" || data.type === "SolvedFirst") &&
+            player.id === data.id
+          ) {
             payload.word = clients[data.roomCode]["game"].currentWord;
           }
           player.client.send(JSON.stringify(payload));
         }
       });
 
+
       if (
         clients[data.roomCode]["game"].isStarted &&
         clients[data.roomCode]["game"]["solved"].size ===
-          clients[data.roomCode]["players"].length - 1
+        clients[data.roomCode]["players"].length - 1
       )
         displayResult(data.roomCode);
     });
@@ -371,7 +439,7 @@ function handleSockets(wss) {
         } else if (
           clients[roomCode]["game"].status === "DrawingWord" &&
           clients[roomCode]["game"]["solved"].size >=
-            clients[roomCode]["players"].length - 1
+          clients[roomCode]["players"].length - 1
         ) {
           displayResult(roomCode);
         }
@@ -395,7 +463,8 @@ function handleSockets(wss) {
           for (let i = 1; i < clients[roomCode]["players"].length; i++) {
             if (
               clients[roomCode]["players"][i].client &&
-              clients[roomCode]["players"][i].client.readyState === WebSocket.OPEN
+              clients[roomCode]["players"][i].client.readyState ===
+              WebSocket.OPEN
             ) {
               clients[roomCode]["players"][i].client.send(
                 JSON.stringify({

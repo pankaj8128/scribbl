@@ -42,38 +42,28 @@
                 <div class="card-header">
                     <h2>Play Scribbl!</h2>
                 </div>
-                <p class="card-desc">Enter your username and click Play to draw & guess with random players, or play with friends below!</p>
+                <% if (locals.error === 'banned') { %>
+                    <div id="banned" style="background-color: rgba(255, 0, 0, 0.1); color: #ff4444; padding: 12px; margin-bottom: 20px; border-radius: 8px; text-align: center; font-weight: bold; border: 1px solid rgba(255, 0, 0, 0.2);">
+                        You have been banned from playing for spamming chat.
+                    </div>
+                <% } %>
+                <p class="card-desc">Enter your username and click Play to draw & guess!</p>
                 <form id="scribbl-lobby-form" action="/play-random" method="post">
                     <!-- Shared Username Input -->
                     <div class="input-group">
                         <input type="text" id="lobby-username" name="username" placeholder="Enter your name..." required>
+                        <input type="hidden" id="lobby-room-code" name="roomCode" value="<%= locals.prefillRoom || '' %>">
                     </div>
 
-                    <!-- Big Play Button for Public Match (Play with Randoms) -->
+                    <!-- Big Play Button -->
                     <button type="submit" id="btn-play-random" class="btn btn-play-random">
-                        <span class="btn-text">Play! (Random Match)</span>
+                        <span class="btn-text">Play!</span>
                     </button>
 
-                    <div class="card-section-divider">
-                        <div class="divider-line"></div>
-                        <span class="divider-text">OR PLAY WITH FRIENDS</span>
-                        <div class="divider-line"></div>
-                    </div>
-
                     <!-- Actions Grid -->
-                    <div class="actions-grid">
+                    <div class="actions-grid" style="margin-top: 15px;">
                         <button type="button" id="btn-create-private" class="btn btn-create-private">
                             <span class="btn-text">Create Private Room</span>
-                        </button>
-                    </div>
-
-                    <!-- Join Section -->
-                    <div class="join-private-section">
-                        <div class="input-group">
-                            <input type="text" id="lobby-room-code" name="roomCode" placeholder="Enter Room Code..." value="<%= locals.prefillRoom || '' %>">
-                        </div>
-                        <button type="button" id="btn-join-private" class="btn btn-join-private">
-                            <span class="btn-text">Join Room</span>
                         </button>
                     </div>
                 </form>
@@ -93,10 +83,24 @@
             const roomCodeInput = document.getElementById('lobby-room-code');
             const btnPlayRandom = document.getElementById('btn-play-random');
             const btnCreatePrivate = document.getElementById('btn-create-private');
-            const btnJoinPrivate = document.getElementById('btn-join-private');
+            
+            const banned = document.getElementById("banned");
+            if (banned) {
+                setTimeout(() => {
+                    banned.remove();
+                }, 3000);
+            }
 
             // Focus username input
             usernameInput.focus();
+
+            btnPlayRandom.addEventListener('click', () => {
+                if (roomCodeInput.value.trim()) {
+                    form.action = '/join-room';
+                } else {
+                    form.action = '/play-random';
+                }
+            });
 
             // Create Private Room action
             btnCreatePrivate.addEventListener('click', () => {
@@ -108,43 +112,25 @@
                 form.submit();
             });
 
-            // Join Private Room action
-            btnJoinPrivate.addEventListener('click', () => {
-                if (!usernameInput.value.trim()) {
-                    usernameInput.reportValidity();
-                    return;
-                }
-                if (!roomCodeInput.value.trim()) {
-                    roomCodeInput.reportValidity();
-                    return;
-                }
-                form.action = '/join-room';
-                form.submit();
-            });
-
             // Smart Enter key handling
             usernameInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     e.preventDefault();
-                    if (roomCodeInput.value.trim()) {
-                        btnJoinPrivate.click();
-                    } else {
-                        btnPlayRandom.click();
+                    if (!usernameInput.value.trim()) {
+                        usernameInput.reportValidity();
+                        return;
                     }
+                    if (roomCodeInput.value.trim()) {
+                        form.action = '/join-room';
+                    } else {
+                        form.action = '/play-random';
+                    }
+                    form.submit();
                 }
             });
 
-            roomCodeInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    btnJoinPrivate.click();
-                }
-            });
-
-            // If prefilled room, scroll to join room inputs
             <% if (locals.prefillRoom) { %>
-                usernameInput.focus();
-                document.querySelector('.join-private-section').scrollIntoView({ behavior: 'smooth' });
+                btnPlayRandom.querySelector('.btn-text').textContent = 'Join Invited Room';
             <% } %>
         });
     </script>

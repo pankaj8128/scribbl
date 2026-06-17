@@ -6,9 +6,14 @@ const {
 } = require("../utils/helpers");
 
 function setupRoutes(app) {
+
   app.get("/:roomCode", (req, res) => {
     const roomCode = req.params.roomCode;
     if (roomCode in clients) {
+      if (clients[roomCode].bannedIPs && clients[roomCode].bannedIPs.has(req.ip)) {
+        return res.redirect("/?error=banned");
+      }
+
       if (!req.session) {
         req.session = {}; // in case of error
       }
@@ -28,7 +33,9 @@ function setupRoutes(app) {
           clients[roomCode]["game"],
           clients[roomCode]["players"],
         ),
-        isOwner: clients[roomCode]["game"].isPublic ? false : req.session.isOwner,
+        isOwner: clients[roomCode]["game"].isPublic
+          ? false
+          : req.session.isOwner,
       });
     }
     res.redirect("/");
@@ -44,7 +51,12 @@ function setupRoutes(app) {
     // Search for an existing public room with space
     for (const code in clients) {
       const room = clients[code];
-      if (room.game && room.game.isPublic && room.players.length < MAX_PUBLIC_ROOM_SIZE) {
+      if (
+        room.game &&
+        room.game.isPublic &&
+        room.players.length < MAX_PUBLIC_ROOM_SIZE &&
+        !(room.bannedIPs && room.bannedIPs.has(req.ip))
+      ) {
         roomCode = code;
         break;
       }
@@ -56,6 +68,7 @@ function setupRoutes(app) {
       id: id,
       username: username,
       score: 0,
+      bucket: { capacity: 3, lastRefill: "" },
     };
 
     if (roomCode) {
@@ -70,7 +83,7 @@ function setupRoutes(app) {
     } else {
       // Create new public room
       roomCode = createRoomLink();
-      clients[roomCode] = { players: [player] };
+      clients[roomCode] = { players: [player], bannedIPs: new Set() };
       const game = {
         isStarted: false,
         startTime: Date.now(),
@@ -109,8 +122,9 @@ function setupRoutes(app) {
       id: id,
       username: username,
       score: 0,
+      bucket: { capacity: 3, lastRefill: "" },
     };
-    clients[roomCode] = { players: [player] };
+    clients[roomCode] = { players: [player], bannedIPs: new Set() };
     const game = {
       isStarted: false,
       startTime: Date.now(),
@@ -143,11 +157,15 @@ function setupRoutes(app) {
     if (!username || !roomCode) return res.redirect("/");
     const id = createRoomLink();
     if (roomCode in clients) {
+      if (clients[roomCode].bannedIPs && clients[roomCode].bannedIPs.has(req.ip)) {
+        return res.redirect("/?error=banned");
+      }
       const player = {
         ip: req.ip,
         id: id,
         username: username,
         score: 0,
+        bucket: { capacity: 3, lastRefill: "" },
       };
       clients[roomCode]["players"].push(player);
       res.cookie("id", id, { path: "/" });
@@ -163,7 +181,8 @@ function setupRoutes(app) {
 
   app.get("/", (req, res) => {
     const prefillRoom = req.query.room || "";
-    res.render("index", { prefillRoom });
+    const error = req.query.error || "";
+    res.render("index", { prefillRoom, error });
   });
 }
 
