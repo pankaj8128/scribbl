@@ -136,8 +136,14 @@ function onConnect(socket, roomCode) {
   }
 }
 
+function heartbeat() {
+  this.isAlive = true;
+}
+
 function handleSockets(wss) {
   wss.on("connection", (socket, req) => {
+    socket.isAlive = true;
+    socket.on("pong", heartbeat);
     const rawCookies = req.headers.cookie || "";
     const cookies = cookie.parse(rawCookies);
     const roomCode = cookies.roomCode;
@@ -483,6 +489,18 @@ function handleSockets(wss) {
     socket.on("error", (error) => {
       console.log("Error: ", error);
     });
+  });
+
+  const interval = setInterval(function ping() {
+    wss.clients.forEach(function each(ws) {
+      if (ws.isAlive === false) return ws.terminate();
+      ws.isAlive = false;
+      ws.ping();
+    });
+  }, 20000);
+
+  wss.on("close", function close() {
+    clearInterval(interval);
   });
 }
 
